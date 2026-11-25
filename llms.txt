@@ -1,0 +1,24 @@
+# why666
+
+> Multi-protocol sing-box (>= 1.14) management script with multi-config concurrency, NaiveProxy, Snell v6, AnyTLS-REALITY, one-click Cloudflare Argo tunnels, and AI-Agent native deployment.
+
+- Repository: https://github.com/whypuss/why666
+- Full AI Skill Specification: https://raw.githubusercontent.com/whypuss/why666/main/SKILL.md
+- One-Click Installer: https://raw.githubusercontent.com/whypuss/why666/main/install.sh
+- Documentation & Interactive Command Builder (Cloudflare Pages): https://whycat666.pages.dev/
+- GitHub Pages Mirror: https://whypuss.github.io/why666/
+
+## Quick AI One-Line Deploy (Zero Prompts, JSON Output)
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/whypuss/why666/main/install.sh) \
+  --non-interactive --protocols "reality,hy2,snell,anyreality" --argo quick --bbr --json
+```
+
+## Supported Highlights
+- **Core**: Official SagerNet/sing-box (>= 1.14.4), multi-config directory `/etc/why666/conf/*.json`
+- **Modern Protocols**: NaiveProxy (`naive` / `native`, H2 + H3/QUIC, built-in ACME), Snell v5/v6 (`snell`, traffic shaping mode), AnyTLS-REALITY (`anyreality`), VLESS-WS (`vless-ws`)
+- **Standard Protocols**: VLESS-REALITY, VLESS-HTTP2-REALITY, Hysteria2, TUIC, AnyTLS, Trojan, Shadowsocks 2022, VMess/VLESS/Trojan + WS/H2/HTTPUpgrade + Caddy Auto-TLS, Socks5, Direct
+- **CF Argo**: `why666 argo quick` (zero-domain temporary tunnel) & `why666 argo fixed <domain> <token>` (persistent tunnel), HTTP2/QUIC switchable
+- **AI Commands**: `why666 ai deploy`, `why666 ai json`, `why666 ai doctor --json`, `why666 ai prompt`
+- **OS Support**: Ubuntu, Debian, CentOS, Rocky, AlmaLinux, SUSE, Alpine (systemd & OpenRC, amd64 & arm64)

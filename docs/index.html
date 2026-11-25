@@ -1,0 +1,2022 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>why666 使用說明書 — sing-box 多協議一鍵腳本手冊與指令生成器</title>
+  <meta name="description" content="why666 官方使用說明書：完整收錄所有 sing-box 協議新增指令（AnyTLS、Snell v6、NaiveProxy、VLESS-REALITY、Hysteria2 等）、單條指令拼裝器、CF Argo 隧道、AI 無交互部署與排錯指南。" />
+  <style>
+    :root {
+      --bg: #f6f3ec;
+      --bg-dot: rgba(23, 22, 20, 0.06);
+      --surface: #fffdf8;
+      --surface-2: #efeae0;
+      --ink: #171614;
+      --muted: #5c574e;
+      --border: #d9d2c5;
+      --accent: #c84b1a;
+      --accent-soft: rgba(200, 75, 26, 0.11);
+      --accent-ink: #ffffff;
+      --ok: #1b7a4c;
+      --ok-soft: rgba(27, 122, 76, 0.12);
+      --warn: #a15c07;
+      --warn-soft: rgba(161, 92, 7, 0.12);
+      --code-bg: #151614;
+      --code-ink: #f1ece1;
+      --code-muted: #938e84;
+      --shadow: 0 2px 10px rgba(23, 22, 20, 0.05);
+      --radius: 12px;
+      --mono: "JetBrains Mono", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+      --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .dark {
+      --bg: #111210;
+      --bg-dot: rgba(255, 255, 255, 0.045);
+      --surface: #191b18;
+      --surface-2: #232621;
+      --ink: #ece8df;
+      --muted: #9f9a8f;
+      --border: #2e322b;
+      --accent: #ef6d3b;
+      --accent-soft: rgba(239, 109, 59, 0.16);
+      --accent-ink: #111210;
+      --ok: #38c17c;
+      --ok-soft: rgba(56, 193, 124, 0.16);
+      --warn: #f0b44c;
+      --warn-soft: rgba(240, 180, 76, 0.16);
+      --code-bg: #0b0c0a;
+      --code-ink: #e8e2d5;
+      --code-muted: #7c776e;
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; overflow-x: clip; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background-color: var(--bg);
+      background-image: radial-gradient(var(--bg-dot) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--ink);
+      line-height: 1.62;
+      overflow-x: clip;
+      max-width: 100vw;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: var(--mono);
+      font-size: 0.88em;
+      background: var(--surface-2);
+      padding: 2px 6px;
+      border-radius: 5px;
+      word-break: break-all;
+    }
+
+    /* Top Header */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1.5px solid var(--border);
+    }
+    .topbar-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .brand-badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+    .search-wrap {
+      flex: 1;
+      max-width: 420px;
+      min-width: 210px;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 8px 34px 8px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 13.5px;
+      outline: none;
+    }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-kbd {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 5px;
+      pointer-events: none;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn {
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn:hover { border-color: var(--ink); text-decoration: none; }
+    .btn.primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+    }
+    .btn.primary:hover { opacity: 0.92; }
+
+    /* Shell Layout */
+    .shell {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 24px 20px 72px;
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 74px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 10px 8px;
+    }
+    .nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-list a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .nav-list a:hover, .nav-list a.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Main Content */
+    .main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+    .hero {
+      background: var(--surface);
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      padding: 26px 26px 22px;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 102px;
+    }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3.2vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .hero p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14.5px;
+    }
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .pill {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: var(--surface-2);
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+    .pill.accent { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+    .pill.ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+    .pill.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+
+    .section {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 78px;
+    }
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-bottom: 1.5px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }
+    .section-sub { font-size: 13px; color: var(--muted); }
+
+    /* Code Block with Copy */
+    .cmd-box {
+      position: relative;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      border-radius: 10px;
+      padding: 12px 76px 12px 14px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.55;
+      overflow-x: auto;
+      margin: 8px 0;
+    }
+    .cmd-box pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+      font-family: inherit;
+    }
+    .cmd-box .cmd-note {
+      display: block;
+      color: var(--code-muted);
+      font-size: 11.5px;
+      margin-bottom: 3px;
+    }
+    .copy-btn {
+      position: absolute;
+      right: 9px;
+      top: 9px;
+      background: rgba(255, 255, 255, 0.11);
+      color: #f3ede2;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* Filter Tabs */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .tab {
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: var(--ink);
+      color: var(--surface);
+      border-color: var(--ink);
+    }
+
+    /* Protocol Cards Grid */
+    .proto-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 500px) {
+      .proto-grid { grid-template-columns: 1fr; }
+    }
+    .proto-card {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 15px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .proto-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .proto-name {
+      font-weight: 800;
+      font-size: 15.5px;
+    }
+    .proto-aliases {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .proto-syntax {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      padding: 6px 9px;
+      border-radius: 7px;
+      word-break: break-all;
+    }
+    .proto-note {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 0;
+    }
+    .proto-examples {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .mini-cmd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .mini-cmd-text {
+      overflow-x: auto;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .mini-cmd-desc {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--code-muted);
+      display: block;
+    }
+    .mini-copy {
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.12);
+      color: #f3ede2;
+      border: none;
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .mini-copy:hover { background: var(--accent); }
+
+    /* Interactive Builders */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .field label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 13.5px;
+      font-family: var(--sans);
+    }
+    .field input:disabled, .field select:disabled { opacity: 0.45; }
+
+    /* Multi-protocol checklist */
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .check-item {
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 10px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .check-item label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .check-item input[type="text"] {
+      padding: 5px 8px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    /* Reference Tables */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    th, td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: var(--bg);
+    }
+    .tbl-cmd {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tbl-copy {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .tbl-copy:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Callout & FAQ */
+    .callout {
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+      padding: 12px 14px;
+      border-radius: 0 9px 9px 0;
+      font-size: 13.5px;
+      margin: 12px 0;
+    }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 15px;
+      margin-bottom: 10px;
+      background: var(--bg);
+    }
+    .faq-item h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+    .faq-item p { margin: 0; font-size: 13.5px; color: var(--muted); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 99;
+      background: var(--ink);
+      color: var(--surface);
+      padding: 10px 16px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: var(--shadow);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Mobile quick bar, drawer & back-to-top (desktop hidden) */
+    .mobile-only { display: none; }
+    .mobile-quicknav {
+      display: none;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 6px;
+      padding: 6px 12px 8px;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-quicknav::-webkit-scrollbar { display: none; }
+    .mobile-quicknav a {
+      flex-shrink: 0;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 99px;
+      text-decoration: none;
+    }
+    .mobile-quicknav a.active {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+    }
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 80;
+    }
+    .drawer-backdrop.open { display: block; }
+    .drawer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 85;
+      background: var(--surface);
+      border-top: 2px solid var(--ink);
+      border-radius: 18px 18px 0 0;
+      padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: translateY(105%);
+      transition: transform 0.22s ease;
+      box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.25);
+    }
+    .drawer.open { transform: translateY(0); }
+    .drawer-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .drawer-head strong { font-size: 15px; }
+    .drawer-links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .drawer-links a {
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 8px 11px;
+      border-radius: 9px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+    .drawer-links a.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .drawer-ext {
+      display: flex;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .drawer-ext a { flex: 1; justify-content: center; }
+
+    .back-top {
+      position: fixed;
+      right: 16px;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      z-index: 60;
+      width: 42px;
+      height: 42px;
+      border-radius: 99px;
+      border: 1.5px solid var(--ink);
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .back-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12.5px;
+      margin-top: 8px;
+    }
+
+    /* Tablet & Mobile Responsive Overhaul */
+    @media (max-width: 960px) {
+      .desktop-only { display: none !important; }
+      .mobile-only { display: inline-flex; }
+      .mobile-quicknav { display: flex; }
+      .sidebar { display: none; }
+      .topbar-inner {
+        padding: 9px 12px;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+      .brand { font-size: 18px; gap: 7px; flex-shrink: 0; }
+      .brand-badge { font-size: 10.5px; padding: 2px 6px; }
+      .search-wrap {
+        display: none;
+        order: 10;
+        flex: 0 0 100%;
+        max-width: 100%;
+        min-width: 0;
+        padding-top: 4px;
+      }
+      .topbar.search-open .topbar-inner { flex-wrap: wrap; }
+      .topbar.search-open .search-wrap { display: block; }
+      .search-kbd { display: none; }
+      .top-actions { gap: 6px; flex-shrink: 0; }
+      .top-actions .btn { padding: 6px 10px; font-size: 12.5px; min-height: 36px; }
+
+      .shell {
+        grid-template-columns: 1fr;
+        padding: 14px 10px 84px;
+        gap: 16px;
+      }
+      .main { gap: 16px; }
+      .hero { padding: 16px 14px; border-radius: 13px; border-width: 1.5px; }
+      .hero h1 { font-size: 22px; }
+      .hero p { font-size: 14px; margin-bottom: 12px; }
+      .hero-stats { gap: 6px; margin-bottom: 14px; }
+      .pill { font-size: 11.5px; padding: 2px 8px; }
+
+      .section {
+        padding: 15px 12px;
+        border-radius: 12px;
+        scroll-margin-top: 102px;
+      }
+      .section-head { padding-bottom: 10px; margin-bottom: 12px; gap: 4px; }
+      .section-head h2 { font-size: 17.5px; }
+      .section-sub { font-size: 12.5px; }
+
+      .tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+      .tabs::-webkit-scrollbar { display: none; }
+      .tab { flex-shrink: 0; min-height: 36px; padding: 6px 12px; font-size: 13px; }
+
+      .cmd-box {
+        padding: 12px 12px 12px 12px;
+        font-size: 12.5px;
+      }
+      .cmd-box .cmd-note { padding-right: 60px; }
+      .cmd-box pre { padding-top: 4px; padding-right: 54px; }
+      .copy-btn {
+        min-height: 32px;
+        padding: 5px 11px;
+        font-size: 12px;
+      }
+
+      .proto-grid { grid-template-columns: 1fr; gap: 12px; }
+      .proto-card { padding: 13px 12px; }
+      .proto-name { font-size: 15px; }
+      .mini-cmd {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px;
+      }
+      .mini-cmd-text {
+        white-space: pre-wrap;
+        word-break: break-all;
+        overflow-x: visible;
+        font-size: 12.5px;
+      }
+      .mini-copy {
+        align-self: flex-end;
+        min-height: 34px;
+        min-width: 64px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      /* Prevent iOS Safari zoom on focus */
+      .field input, .field select, .search-wrap input, .check-item input[type="text"] {
+        font-size: 16px;
+        min-height: 42px;
+      }
+      .form-grid { grid-template-columns: 1fr; gap: 10px; }
+      .check-grid { grid-template-columns: 1fr; }
+      .check-item { padding: 10px 12px; }
+      .check-item label { font-size: 14px; min-height: 28px; }
+
+      /* Transform wide tables into clean vertical cards on mobile */
+      .table-wrap { overflow-x: visible; }
+      table, thead, tbody, tr, td { display: block; width: 100%; }
+      thead { display: none; }
+      tbody { display: flex; flex-direction: column; gap: 10px; }
+      tbody tr {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 11px 12px;
+        background: var(--bg);
+      }
+      tbody td {
+        padding: 0;
+        border: none;
+      }
+      tbody td + td { margin-top: 6px; }
+      .tbl-cmd {
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .tbl-cmd code {
+        flex: 1;
+        font-size: 12.5px;
+        padding: 4px 7px;
+      }
+      .tbl-copy {
+        flex-shrink: 0;
+        min-height: 32px;
+        padding: 5px 12px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .toast {
+        left: 14px;
+        right: 14px;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        text-align: center;
+      }
+      .back-top {
+        bottom: calc(64px + env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#quickstart">
+      <span>why666</span>
+      <span class="brand-badge">v1.1.1</span>
+    </a>
+    <div class="search-wrap">
+      <input id="globalSearch" type="search" placeholder="搜尋協議或指令，如 snell / naive / argo / passwd" autocomplete="off" />
+      <span class="search-kbd">/</span>
+    </div>
+    <div class="top-actions">
+      <button class="btn mobile-only" id="mobileSearchBtn" type="button">搜尋</button>
+      <a class="btn desktop-only" href="https://github.com/whypuss/why666" target="_blank">GitHub</a>
+      <a class="btn desktop-only" href="https://raw.githubusercontent.com/whypuss/why666/main/SKILL.md" target="_blank">AI SKILL</a>
+      <button class="btn" id="themeBtn" type="button">明暗</button>
+      <button class="btn primary mobile-only" id="drawerOpenBtn" type="button">目錄</button>
+    </div>
+  </div>
+  <nav class="mobile-quicknav" id="mobileQuickNav" aria-label="快捷章節">
+    <a href="#quickstart" class="active">安裝</a>
+    <a href="#builder-single">指令拼裝</a>
+    <a href="#protocols">協議速查</a>
+    <a href="#manage">修改管理</a>
+    <a href="#argo">CF Argo</a>
+    <a href="#ai">AI 部署</a>
+    <a href="#builder-multi">批量生成</a>
+    <a href="#ops">系統維護</a>
+    <a href="#faq">排錯 FAQ</a>
+  </nav>
+</header>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="mobileDrawer" aria-label="手機目錄">
+  <div class="drawer-head">
+    <strong>why666 說明書目錄</strong>
+    <button class="btn" id="drawerCloseBtn" type="button">關閉</button>
+  </div>
+  <div class="drawer-links" id="drawerLinks">
+    <a href="#quickstart">1. 快速安裝</a>
+    <a href="#builder-single">2. 指令拼裝器</a>
+    <a href="#protocols">3. 全協議速查</a>
+    <a href="#manage">4. 修改與刪除</a>
+    <a href="#argo">5. CF Argo</a>
+    <a href="#ai">6. AI 部署</a>
+    <a href="#builder-multi">7. 批量生成器</a>
+    <a href="#ops">8. 系統維護</a>
+    <a href="#faq">9. 常見排錯</a>
+  </div>
+  <div class="drawer-ext">
+    <a class="btn" href="https://github.com/whypuss/why666" target="_blank">GitHub 倉庫</a>
+    <a class="btn" href="https://raw.githubusercontent.com/whypuss/why666/main/SKILL.md" target="_blank">AI SKILL.md</a>
+  </div>
+</aside>
+
+<button class="back-top" id="backTopBtn" type="button" aria-label="回到頂部">↑</button>
+
+<div class="shell">
+  <aside class="sidebar">
+    <p class="sidebar-title">說明書目錄</p>
+    <ul class="nav-list" id="navList">
+      <li><a href="#quickstart" class="active">1. 快速安裝與上手</a></li>
+      <li><a href="#builder-single">2. 單條新增指令拼裝器</a></li>
+      <li><a href="#protocols">3. 全協議新增速查</a></li>
+      <li><a href="#manage">4. 修改 / 查看 / 刪除</a></li>
+      <li><a href="#argo">5. CF Argo 隧道</a></li>
+      <li><a href="#ai">6. AI 無交互部署</a></li>
+      <li><a href="#builder-multi">7. 一鍵批量部署生成器</a></li>
+      <li><a href="#ops">8. 系統維護與工具</a></li>
+      <li><a href="#faq">9. 常見問題排錯</a></li>
+    </ul>
+  </aside>
+
+  <main class="main">
+    <!-- Hero / Quickstart -->
+    <section class="hero" id="quickstart">
+      <h1>why666 完整使用說明書</h1>
+      <p>自研 <code>sing-box</code> 多協議一鍵安裝與管理腳本。安裝後直接使用短命令 <code>yy</code>（等同 <code>why666</code>），支援多配置同時運行、一秒增刪改查、Cloudflare Argo 隧道與 AI 自動化部署。</p>
+      <div class="hero-stats">
+        <span class="pill accent">短命令: yy</span>
+        <span class="pill ok">預設協議: AnyTLS</span>
+        <span class="pill">核心: sing-box ≥ 1.14</span>
+        <span class="pill">支援 Ubuntu / Debian / CentOS / Rocky / SUSE / Alpine</span>
+        <span class="pill">amd64 / arm64 · systemd &amp; OpenRC</span>
+      </div>
+
+      <div class="tabs" id="installTabs">
+        <button class="tab active" data-install="curl" type="button">一鍵安裝 (curl)</button>
+        <button class="tab" data-install="wget" type="button">一鍵安裝 (wget)</button>
+        <button class="tab" data-install="update" type="button">升級至最新版</button>
+      </div>
+      <div class="cmd-box" id="installCmdBox">
+        <span class="cmd-note" id="installNote">預設自動安裝 sing-box 最新正式版並建立一個 AnyTLS 節點（需 root 權限）</span>
+        <pre id="installCmd">bash &lt;(curl -fsSL https://raw.githubusercontent.com/whypuss/why666/main/install.sh)</pre>
+        <button class="copy-btn" data-copy-target="installCmd" type="button">複製</button>
+      </div>
+
+      <div class="callout">
+        <strong>快速規則：</strong>所有參數都支援填入 <code>auto</code> 代表隨機產生。只想開互動選單直接輸入 <code>yy</code>；想快速一鍵建節點就用 <code>yy add &lt;協議&gt; [參數...]</code>，例如 <code>yy add anytls 443</code>、<code>yy add snell</code>、<code>yy add reality</code>。
+      </div>
+    </section>
+
+    <!-- Interactive Single Command Builder -->
+    <section class="section" id="builder-single">
+      <div class="section-head">
+        <h2>單條新增指令拼裝器 (<code>yy add ...</code>)</h2>
+        <span class="section-sub">不用背參數順序，選協議填參數即產生指令</span>
+      </div>
+      <div class="form-grid" id="singleBuilderForm">
+        <div class="field">
+          <label for="sbProto">選擇協議</label>
+          <select id="sbProto"></select>
+        </div>
+      </div>
+      <div class="form-grid" id="singleBuilderFields"></div>
+      <div class="cmd-box">
+        <span class="cmd-note" id="sbHint">留空的選填欄位將自動隨機生成或使用預設值</span>
+        <pre id="sbOutput">yy add anytls</pre>
+        <button class="copy-btn" data-copy-target="sbOutput" type="button">複製</button>
+      </div>
+    </section>
+
+    <!-- All Protocols Reference -->
+    <section class="section" id="protocols">
+      <div class="section-head">
+        <h2>全協議新增指令速查手冊</h2>
+        <span class="section-sub" id="protoCountText">共收錄 22 組協議與別名</span>
+      </div>
+      <div class="tabs" id="protoFilterTabs">
+        <button class="tab active" data-cat="all" type="button">全部協議</button>
+        <button class="tab" data-cat="nodomain" type="button">免域名推薦</button>
+        <button class="tab" data-cat="domain" type="button">需域名 / Auto-TLS</button>
+        <button class="tab" data-cat="legacy" type="button">WS / 傳統 / 轉發</button>
+      </div>
+      <div class="proto-grid" id="protoCards"></div>
+    </section>
+
+    <!-- Management & Modification -->
+    <section class="section" id="manage">
+      <div class="section-head">
+        <h2>查看、修改、刪除與修復速查</h2>
+        <span class="section-sub">支援模糊比對設定檔名（如只填 <code>snell</code> 或埠號 <code>443</code>），若只有一個配置會自動選中</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th style="width:36%">指令與範例</th><th style="width:24%">作用</th><th>說明</th></tr>
+          </thead>
+          <tbody id="manageTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CF Argo -->
+    <section class="section" id="argo">
+      <div class="section-head">
+        <h2>Cloudflare Argo 一鍵隧道專章</h2>
+        <span class="section-sub">即使 VPS IP 或埠被封仍可透過 CF CDN 連線，支援臨時與固定隧道</span>
+      </div>
+      <p style="margin-top:0;font-size:14px;color:var(--muted);">
+        執行 <code>yy argo quick</code> 或 <code>yy argo fixed</code> 時，腳本會自動下載 <code>cloudflared</code>，並自動尋找或新建一個本地 <code>VMess-WS</code> / <code>VLESS-WS</code> 入站作為後端，完成後直接產出 <strong>443 TLS</strong> 與 <strong>80 無 TLS</strong> 兩條可換優選 IP 的分享連結。
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th style="width:42%">指令範例</th><th>說明</th></tr>
+          </thead>
+          <tbody id="argoTableBody"></tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <strong>固定隧道設定要點：</strong>在 Cloudflare Zero Trust → Networks → Tunnels 建立隧道後取得 <code>eyJ...</code> Token，並在 <strong>Public Hostname</strong> 裡將你的子域名指向 <code>http://127.0.0.1:&lt;後端埠&gt;</code>（後端埠可在 <code>yy argo info</code> 看到）。
+      </div>
+    </section>
+
+    <!-- AI Deployment -->
+    <section class="section" id="ai">
+      <div class="section-head">
+        <h2>AI 原生部署方式與結構化輸出</h2>
+        <span class="section-sub">專為 Claude Code / Antigravity / OpenClaw / Codex 等 AI Agent 與自動化腳本設計</span>
+      </div>
+      <p style="margin-top:0;font-size:14px;color:var(--muted);">
+        直接把本專案的 <a href="https://raw.githubusercontent.com/whypuss/why666/main/SKILL.md" target="_blank"><code>SKILL.md</code></a> 或 <a href="https://raw.githubusercontent.com/whypuss/why666/main/llms.txt" target="_blank"><code>llms.txt</code></a> 丟給支援 SSH 的 AI 助手，AI 就會以 <code>--non-interactive --json</code> 全程零阻塞完成部署、跑 <code>yy ai doctor --json</code> 自檢並整理所有節點給你。
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th style="width:42%">AI 專屬指令 / 安裝參數</th><th>說明</th></tr>
+          </thead>
+          <tbody id="aiTableBody"></tbody>
+        </table>
+      </div>
+      <div class="cmd-box">
+        <span class="cmd-note">AI / 無交互一條命令安裝 + 多協議 + Argo 臨時隧道 + BBR + JSON 輸出</span>
+        <pre id="aiQuickCmd">bash &lt;(curl -fsSL https://raw.githubusercontent.com/whypuss/why666/main/install.sh) \
+  --non-interactive \
+  --protocols "anytls,reality,hy2,snell" \
+  --argo quick \
+  --bbr \
+  --json</pre>
+        <button class="copy-btn" data-copy-target="aiQuickCmd" type="button">複製</button>
+      </div>
+    </section>
+
+    <!-- Multi-protocol One-Click Generator -->
+    <section class="section" id="builder-multi">
+      <div class="section-head">
+        <h2>一鍵批量部署 / AI 提示詞生成器</h2>
+        <span class="section-sub">勾選需要的協議與 Argo 選項，自動產生 SSH 命令或發給 AI 的提示詞</span>
+      </div>
+      <div class="check-grid" id="multiProtoGrid"></div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="mArgoMode">CF Argo 隧道</label>
+          <select id="mArgoMode">
+            <option value="">關閉</option>
+            <option value="quick" selected>臨時隧道 (Quick, 免域名)</option>
+            <option value="fixed">固定隧道 (Fixed, 需域名+Token)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mArgoBackend">Argo 後端協議</label>
+          <select id="mArgoBackend">
+            <option value="vmess">VMess-WS (預設)</option>
+            <option value="vless">VLESS-WS</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mArgoProto">Argo 傳輸模式</label>
+          <select id="mArgoProto">
+            <option value="http2">HTTP2 (TCP, 預設)</option>
+            <option value="quic">QUIC (UDP)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mArgoDomain">固定隧道域名</label>
+          <input id="mArgoDomain" type="text" placeholder="argo.example.com" disabled />
+        </div>
+        <div class="field">
+          <label for="mArgoToken">固定隧道 Token</label>
+          <input id="mArgoToken" type="text" placeholder="eyJhIjoi..." disabled />
+        </div>
+        <div class="field">
+          <label>附加選項</label>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;padding-top:6px;font-size:13px;font-weight:600;">
+            <label><input type="checkbox" id="mBbr" checked /> 啟用 BBR</label>
+            <label><input type="checkbox" id="mJson" checked /> JSON 輸出</label>
+            <label><input type="checkbox" id="mSkipDns" /> 跳過 DNS 預檢</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs" id="multiOutTabs">
+        <button class="tab active" data-mode="curl" type="button">SSH 一鍵命令 (curl)</button>
+        <button class="tab" data-mode="wget" type="button">SSH 一鍵命令 (wget)</button>
+        <button class="tab" data-mode="env" type="button">環境變數單行</button>
+        <button class="tab" data-mode="ai" type="button">AI Agent 代部署提示詞</button>
+      </div>
+      <div class="cmd-box">
+        <pre id="multiOutput"></pre>
+        <button class="copy-btn" data-copy-target="multiOutput" type="button">複製</button>
+      </div>
+    </section>
+
+    <!-- System Ops -->
+    <section class="section" id="ops">
+      <div class="section-head">
+        <h2>系統維護、核心管理與工具指令</h2>
+        <span class="section-sub">同時完整透傳 sing-box 原生指令（如 <code>yy generate uuid</code>）</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th style="width:38%">指令</th><th>功能說明</th></tr>
+          </thead>
+          <tbody id="opsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="section-head">
+        <h2>常見問題與實戰排錯</h2>
+        <span class="section-sub">最常遇到的客戶端報錯、證書與防火牆問題</span>
+      </div>
+      <div id="faqList"></div>
+    </section>
+
+    <footer>
+      why666 v1.1.1 · <a href="https://github.com/whypuss/why666" target="_blank">github.com/whypuss/why666</a> · Deployed on Cloudflare Pages
+    </footer>
+  </main>
+</div>
+
+<div class="toast" id="toast">已複製到剪貼簿</div>
+
+<script>
+(() => {
+  const RAW = 'https://raw.githubusercontent.com/whypuss/why666/main';
+
+  const PROTOCOLS = [
+    {
+      id: 'anytls',
+      name: 'AnyTLS',
+      aliases: 'anytls',
+      cat: 'nodomain',
+      badges: [['預設推薦', 'accent'], ['免域名', 'ok']],
+      syntax: 'yy add anytls [port] [password] [domain]',
+      note: '安裝預設協議。不填域名時使用自簽 TLS（客戶端需開啟跳過證書驗證）；填入已解析域名則自動使用 sing-box 內建 ACME 申請正式證書。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機，例如 443' },
+        { key: 'password', label: '密碼 [password]', placeholder: '留空隨機 UUID (或填 auto)' },
+        { key: 'domain', label: '域名 [domain] (選填)', placeholder: '填域名則自動啟用 ACME 證書' }
+      ],
+      examples: [
+        { desc: '全自動（隨機埠 + 隨機密碼）', cmd: 'yy add anytls' },
+        { desc: '指定 443 端口', cmd: 'yy add anytls 443' },
+        { desc: '指定端口與密碼', cmd: 'yy add anytls 443 mypassword123' },
+        { desc: '綁定域名自動申請 ACME 證書', cmd: 'yy add anytls 443 auto proxy.example.com' }
+      ]
+    },
+    {
+      id: 'snell',
+      name: 'Snell v6 / v5',
+      aliases: 'snell / snell6 / snell5 / sn',
+      cat: 'nodomain',
+      badges: [['新版推薦', 'accent'], ['免域名', 'ok']],
+      syntax: 'yy add snell [port] [psk] [version:6|5] [mode:default|unshaped|unsafe-raw]',
+      note: 'Snell v6 協議強制規定密碼 (PSK) 長度必須為 12–255 字節，建議留空自動生成 36 位 UUID。同步輸出 Nekobox/sing-box、Shadowrocket 連結與 Surge 配置行。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機，例如 19443' },
+        { key: 'psk', label: '密碼 [psk] (v6 需 12-255 字節)', placeholder: '留空自動生成 36 位 UUID' },
+        { key: 'version', label: '版本 [version]', type: 'select', options: [['', '預設 (v6)'], ['6', '6 (Snell v6)'], ['5', '5 (Snell v5)']] },
+        { key: 'mode', label: '流量整形 [mode] (僅 v6)', type: 'select', options: [['', '預設 (default)'], ['default', 'default'], ['unshaped', 'unshaped'], ['unsafe-raw', 'unsafe-raw']] }
+      ],
+      examples: [
+        { desc: '一鍵新增 Snell v6（隨機埠 + 36位密碼）', cmd: 'yy add snell' },
+        { desc: '指定 19443 端口（自動生成合規 PSK）', cmd: 'yy add snell 19443' },
+        { desc: '自訂端口與 ≥12 位密碼', cmd: 'yy add snell 19443 my_snell_key_2026' },
+        { desc: '指定 v6 + unshaped 模式', cmd: 'yy add snell 19443 auto 6 unshaped' },
+        { desc: '新增 Snell v5（相容舊客戶端）', cmd: 'yy add snell5 19444' }
+      ]
+    },
+    {
+      id: 'reality',
+      name: 'VLESS-REALITY',
+      aliases: 'reality / r / vless-reality',
+      cat: 'nodomain',
+      badges: [['免域名', 'ok'], ['Vision 流控', '']],
+      syntax: 'yy add reality [port] [uuid] [sni]',
+      note: '無需域名與自簽證書，自動產生 X25519 公私鑰與隨機高信譽 SNI 偽裝目標，相容絕大多數主流客戶端。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機，例如 443' },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'sni', label: '偽裝域名 [sni]', placeholder: '留空隨機，例如 www.apple.com' }
+      ],
+      examples: [
+        { desc: '一鍵全自動建立', cmd: 'yy add reality' },
+        { desc: '指定 443 端口', cmd: 'yy add reality 443' },
+        { desc: '指定端口與偽裝 SNI', cmd: 'yy add reality 443 auto www.apple.com' }
+      ]
+    },
+    {
+      id: 'anyreality',
+      name: 'AnyTLS-REALITY',
+      aliases: 'anyreality / ar / anytls-reality',
+      cat: 'nodomain',
+      badges: [['免域名', 'ok'], ['無證書警告', '']],
+      syntax: 'yy add anyreality [port] [password] [sni]',
+      note: 'AnyTLS 結合 REALITY 偽裝層，同時解決自簽證書警告與免域名需求，自動產生 8 位 short_id。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機' },
+        { key: 'password', label: '密碼 [password]', placeholder: '留空自動生成 UUID' },
+        { key: 'sni', label: '偽裝域名 [sni]', placeholder: '留空隨機，例如 www.apple.com' }
+      ],
+      examples: [
+        { desc: '一鍵全自動建立', cmd: 'yy add anyreality' },
+        { desc: '指定端口與 SNI', cmd: 'yy add anyreality 24443 auto www.apple.com' }
+      ]
+    },
+    {
+      id: 'hy2',
+      name: 'Hysteria2',
+      aliases: 'hy2 / hy / hysteria2',
+      cat: 'nodomain',
+      badges: [['免域名', 'ok'], ['UDP/QUIC 高速', 'warn']],
+      syntax: 'yy add hy2 [port] [password]',
+      note: '基於 QUIC UDP 的高速抗丟包協議，需確保 VPS 防火牆與雲商安全群組放行對應 UDP 端口。自動計算並輸出 pinSHA256 指紋。',
+      fields: [
+        { key: 'port', label: 'UDP 端口 [port]', placeholder: '留空隨機' },
+        { key: 'password', label: '密碼 [password]', placeholder: '留空自動生成' }
+      ],
+      examples: [
+        { desc: '一鍵建立 Hysteria2', cmd: 'yy add hy2' },
+        { desc: '指定端口與密碼', cmd: 'yy add hy2 20443 myhy2pass' }
+      ]
+    },
+    {
+      id: 'tuic',
+      name: 'TUIC v5',
+      aliases: 'tuic / tuic5',
+      cat: 'nodomain',
+      badges: [['免域名', 'ok'], ['UDP/QUIC + BBR', 'warn']],
+      syntax: 'yy add tuic [port] [uuid]',
+      note: '基於 QUIC 與 BBR 擁塞控制的 UDP 協議，需放行 UDP 端口。',
+      fields: [
+        { key: 'port', label: 'UDP 端口 [port]', placeholder: '留空隨機' },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' }
+      ],
+      examples: [
+        { desc: '一鍵建立 TUIC v5', cmd: 'yy add tuic' },
+        { desc: '指定端口', cmd: 'yy add tuic 20888' }
+      ]
+    },
+    {
+      id: 'naive',
+      name: 'NaiveProxy (H2 + H3)',
+      aliases: 'naive / native / nv / naiveproxy',
+      cat: 'domain',
+      badges: [['需真實域名', 'warn'], ['H2 + H3/QUIC', 'accent']],
+      syntax: 'yy add naive <domain> [port] [username] [password] [cert_path] [key_path]',
+      note: '客戶端採用 Chrome 網路棧嚴格校驗受信任 TLS 證書，不接受自簽證書。請先將域名 A 記錄解析到本機 IP（關閉 CF 小黃雲），sing-box 會透過 ACME 自動簽發證書（或手動傳入已有證書路徑）。同時支援 native 別名。',
+      fields: [
+        { key: 'domain', label: '域名 <domain> (必填)', placeholder: 'proxy.example.com', required: true },
+        { key: 'port', label: '端口 [port]', placeholder: '443 閒置時預設 443' },
+        { key: 'user', label: '用戶名 [username]', placeholder: '預設 why666' },
+        { key: 'pass', label: '密碼 [password]', placeholder: '留空隨機 UUID' },
+        { key: 'cert', label: '自訂證書路徑 [cert_path] (選填)', placeholder: '留空自動 ACME' },
+        { key: 'key', label: '自訂私鑰路徑 [key_path] (選填)', placeholder: '留空自動 ACME' }
+      ],
+      examples: [
+        { desc: '一鍵新增（自動申請證書、預設 443 埠）', cmd: 'yy add naive proxy.example.com' },
+        { desc: '使用 native 別名並指定端口與帳密', cmd: 'yy add native proxy.example.com 443 myuser mypass123456' },
+        { desc: '使用已有本地證書（無需 ACME）', cmd: 'yy add naive proxy.example.com 8443 auto auto /path/cert.crt /path/priv.key' }
+      ]
+    },
+    {
+      id: 'ss',
+      name: 'Shadowsocks 2022',
+      aliases: 'ss / ss2022 / shadowsocks',
+      cat: 'nodomain',
+      badges: [['免域名', 'ok'], ['2022-blake3', '']],
+      syntax: 'yy add ss [port] [password] [method]',
+      note: '預設隨機選用 2022-blake3 系列加密並自動產生合規密鑰（可用 yy ss2022 生成合法密鑰）。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機' },
+        { key: 'password', label: '密碼 [password]', placeholder: '留空自動生成合規 SS2022 密鑰' },
+        { key: 'method', label: '加密方式 [method]', type: 'select', options: [
+          ['', '預設 (隨機 SS2022)'],
+          ['2022-blake3-aes-128-gcm', '2022-blake3-aes-128-gcm'],
+          ['2022-blake3-aes-256-gcm', '2022-blake3-aes-256-gcm'],
+          ['2022-blake3-chacha20-poly1305', '2022-blake3-chacha20-poly1305'],
+          ['aes-256-gcm', 'aes-256-gcm'],
+          ['aes-128-gcm', 'aes-128-gcm'],
+          ['chacha20-ietf-poly1305', 'chacha20-ietf-poly1305']
+        ]}
+      ],
+      examples: [
+        { desc: '一鍵建立 Shadowsocks 2022', cmd: 'yy add ss' },
+        { desc: '指定端口與加密方式', cmd: 'yy add ss 20222 auto 2022-blake3-aes-128-gcm' }
+      ]
+    },
+    {
+      id: 'trojan',
+      name: 'Trojan',
+      aliases: 'trojan',
+      cat: 'nodomain',
+      badges: [['免域名', 'ok']],
+      syntax: 'yy add trojan [port] [password]',
+      note: '標準 Trojan TLS 入站（自簽證書）。如需正式域名證書可改用 tws / th2 / thu。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機' },
+        { key: 'password', label: '密碼 [password]', placeholder: '留空自動生成' }
+      ],
+      examples: [
+        { desc: '一鍵建立 Trojan', cmd: 'yy add trojan' },
+        { desc: '指定端口與密碼', cmd: 'yy add trojan 24443 mytrojanpass' }
+      ]
+    },
+    {
+      id: 'rh2',
+      name: 'VLESS-HTTP2-REALITY',
+      aliases: 'rh2 / vless-http2-reality',
+      cat: 'nodomain',
+      badges: [['免域名', 'ok']],
+      syntax: 'yy add rh2 [port] [uuid] [sni]',
+      note: 'HTTP/2 傳輸模式的 VLESS-REALITY（不使用 Vision 流控）。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機' },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'sni', label: '偽裝域名 [sni]', placeholder: '留空隨機' }
+      ],
+      examples: [
+        { desc: '一鍵建立 VLESS-HTTP2-REALITY', cmd: 'yy add rh2' }
+      ]
+    },
+    {
+      id: 'wss',
+      name: 'VMess-WS-TLS (Caddy Auto-TLS)',
+      aliases: 'wss / vmess-ws-tls',
+      cat: 'domain',
+      badges: [['需真實域名', 'warn'], ['自動裝 Caddy', '']],
+      syntax: 'yy add wss <domain> [uuid] [/path]',
+      note: '自動安裝並設定 Caddy 申請 HTTPS 證書反代 WS，支援套 Cloudflare CDN 與設定偽裝站 (yy web)。',
+      fields: [
+        { key: 'domain', label: '域名 <domain> (必填)', placeholder: 'ws.example.com', required: true },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'path', label: '路徑 [/path]', placeholder: '必須 / 開頭，留空隨機' }
+      ],
+      examples: [
+        { desc: '自動申請證書並建節點', cmd: 'yy add wss ws.example.com' },
+        { desc: '自訂路徑', cmd: 'yy add wss ws.example.com auto /myws' }
+      ]
+    },
+    {
+      id: 'vws',
+      name: 'VLESS-WS-TLS (Caddy Auto-TLS)',
+      aliases: 'vws / vless-ws-tls',
+      cat: 'domain',
+      badges: [['需真實域名', 'warn'], ['自動裝 Caddy', '']],
+      syntax: 'yy add vws <domain> [uuid] [/path]',
+      note: 'VLESS + WebSocket + Caddy 自動 HTTPS 證書，支援 CDN 中轉。',
+      fields: [
+        { key: 'domain', label: '域名 <domain> (必填)', placeholder: 'vless.example.com', required: true },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'path', label: '路徑 [/path]', placeholder: '必須 / 開頭，留空隨機' }
+      ],
+      examples: [
+        { desc: '一鍵新增 VLESS-WS-TLS', cmd: 'yy add vws vless.example.com' },
+        { desc: '跳過 Caddy 手動配 TLS', cmd: 'yy no-auto-tls vws vless.example.com' }
+      ]
+    },
+    {
+      id: 'tws',
+      name: 'Trojan-WS-TLS (Caddy Auto-TLS)',
+      aliases: 'tws / trojan-ws-tls',
+      cat: 'domain',
+      badges: [['需真實域名', 'warn'], ['自動裝 Caddy', '']],
+      syntax: 'yy add tws <domain> [uuid] [/path]',
+      note: 'Trojan + WebSocket + Caddy 自動 HTTPS 證書。如需改為非 UUID 密碼，建完後執行 yy passwd 即可。',
+      fields: [
+        { key: 'domain', label: '域名 <domain> (必填)', placeholder: 'tr.example.com', required: true },
+        { key: 'uuid', label: '密碼/UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'path', label: '路徑 [/path]', placeholder: '必須 / 開頭，留空隨機' }
+      ],
+      examples: [
+        { desc: '一鍵新增 Trojan-WS-TLS', cmd: 'yy add tws tr.example.com' }
+      ]
+    },
+    {
+      id: 'vhu',
+      name: 'HTTPUpgrade-TLS 系列 (VMess / VLESS / Trojan)',
+      aliases: 'hu / vhu / thu',
+      cat: 'domain',
+      badges: [['需真實域名', 'warn'], ['低延遲 CDN', '']],
+      syntax: 'yy add <hu|vhu|thu> <domain> [uuid] [/path]',
+      note: 'hu = VMess-HTTPUpgrade-TLS、vhu = VLESS-HTTPUpgrade-TLS、thu = Trojan-HTTPUpgrade-TLS，比 WS 握手更輕量。',
+      fields: [
+        { key: 'domain', label: '域名 <domain> (必填)', placeholder: 'hu.example.com', required: true },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'path', label: '路徑 [/path]', placeholder: '必須 / 開頭，留空隨機' }
+      ],
+      examples: [
+        { desc: 'VLESS-HTTPUpgrade-TLS', cmd: 'yy add vhu hu.example.com' },
+        { desc: 'VMess-HTTPUpgrade-TLS', cmd: 'yy add hu hu.example.com' },
+        { desc: 'Trojan-HTTPUpgrade-TLS', cmd: 'yy add thu hu.example.com' }
+      ]
+    },
+    {
+      id: 'vh2',
+      name: 'HTTP/2-TLS 系列 (VMess / VLESS / Trojan)',
+      aliases: 'h2 / vh2 / th2',
+      cat: 'domain',
+      badges: [['需真實域名', 'warn']],
+      syntax: 'yy add <h2|vh2|th2> <domain> [uuid] [/path]',
+      note: 'h2 = VMess-H2-TLS、vh2 = VLESS-H2-TLS、th2 = Trojan-H2-TLS，自動透過 Caddy 反代 h2c。',
+      fields: [
+        { key: 'domain', label: '域名 <domain> (必填)', placeholder: 'h2.example.com', required: true },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'path', label: '路徑 [/path]', placeholder: '必須 / 開頭，留空隨機' }
+      ],
+      examples: [
+        { desc: 'VLESS-H2-TLS', cmd: 'yy add vh2 h2.example.com' },
+        { desc: 'VMess-H2-TLS', cmd: 'yy add h2 h2.example.com' }
+      ]
+    },
+    {
+      id: 'ws',
+      name: 'VMess-WS (純 WS，Argo 後端)',
+      aliases: 'ws / vmess-ws',
+      cat: 'legacy',
+      badges: [['Argo 預設後端', 'accent'], ['免域名', 'ok']],
+      syntax: 'yy add ws [port] [uuid] [/path]',
+      note: '無 TLS 的純 WebSocket 入站，非常適合搭配 CF Argo 隧道或 80 系 CDN 回源。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機' },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'path', label: '路徑 [/path]', placeholder: '必須 / 開頭，留空隨機' }
+      ],
+      examples: [
+        { desc: '一鍵新增 VMess-WS', cmd: 'yy add ws' },
+        { desc: '指定端口與路徑', cmd: 'yy add ws 18080 auto /vmws' }
+      ]
+    },
+    {
+      id: 'vless-ws',
+      name: 'VLESS-WS (純 WS，Argo 後端)',
+      aliases: 'vless-ws / vw',
+      cat: 'legacy',
+      badges: [['Argo 後端', 'accent'], ['免域名', 'ok']],
+      syntax: 'yy add vless-ws [port] [uuid] [/path]',
+      note: '無 TLS 的純 VLESS WebSocket 入站，可配合 yy argo quick vless 使用。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機' },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' },
+        { key: 'path', label: '路徑 [/path]', placeholder: '必須 / 開頭，留空隨機' }
+      ],
+      examples: [
+        { desc: '一鍵新增 VLESS-WS', cmd: 'yy add vless-ws' },
+        { desc: '簡寫 vw 指定端口', cmd: 'yy add vw 18081' }
+      ]
+    },
+    {
+      id: 'tcp',
+      name: 'VMess-TCP / HTTP / QUIC',
+      aliases: 'tcp / http / quic',
+      cat: 'legacy',
+      badges: [['傳統協議', '']],
+      syntax: 'yy add <tcp|http|quic> [port] [uuid]',
+      note: '傳統無域名 VMess 傳輸模式（不建議直連高敏感網路，僅作相容保留）。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機' },
+        { key: 'uuid', label: 'UUID [uuid]', placeholder: '留空自動生成' }
+      ],
+      examples: [
+        { desc: 'VMess-TCP', cmd: 'yy add tcp' },
+        { desc: 'VMess-HTTP', cmd: 'yy add http' },
+        { desc: 'VMess-QUIC', cmd: 'yy add quic' }
+      ]
+    },
+    {
+      id: 'socks',
+      name: 'Socks5',
+      aliases: 'socks / socks5',
+      cat: 'legacy',
+      badges: [['中轉代理', '']],
+      syntax: 'yy add socks [port] [username] [password]',
+      note: '標準 Socks5 代理（帶帳號密碼驗證），適合應用程式內建代理或落地鏈式轉發。',
+      fields: [
+        { key: 'port', label: '端口 [port]', placeholder: '留空隨機' },
+        { key: 'user', label: '用戶名 [username]', placeholder: '預設 why666' },
+        { key: 'pass', label: '密碼 [password]', placeholder: '留空自動生成' }
+      ],
+      examples: [
+        { desc: '一鍵建立 Socks5', cmd: 'yy add socks' },
+        { desc: '指定端口與帳密', cmd: 'yy add socks 10808 myuser mypass' }
+      ]
+    },
+    {
+      id: 'door',
+      name: 'Direct (任意門端口轉發)',
+      aliases: 'door / direct',
+      cat: 'legacy',
+      badges: [['端口轉發', '']],
+      syntax: 'yy add door [port] <remote_addr> <remote_port>',
+      note: '將本機監聽端口的流量直接轉發至指定遠端 IP/域名與端口。',
+      fields: [
+        { key: 'port', label: '本機端口 [port]', placeholder: '留空填 auto 隨機，如 18888' },
+        { key: 'raddr', label: '目標地址 <remote_addr>', placeholder: '例如 1.1.1.1', required: true },
+        { key: 'rport', label: '目標端口 <remote_port>', placeholder: '例如 443', required: true }
+      ],
+      examples: [
+        { desc: '將本機 18888 轉發到目標機 443', cmd: 'yy add door 18888 203.0.113.10 443' }
+      ]
+    }
+  ];
+
+  const MANAGE_ROWS = [
+    ['yy', '開啟互動主選單', '無參數執行進入數字選單，適合新手操作'],
+    ['yy ls', '列出所有節點', '顯示 /etc/why666/conf/ 下所有配置檔名與 CF Argo 狀態'],
+    ['yy info [名稱]', '查看節點詳細資訊', '顯示協議參數、連結、Surge 行等；例如 yy info snell 或 yy info 443'],
+    ['yy url [名稱]', '僅輸出分享連結', '方便純文字複製導入客戶端'],
+    ['yy qr [名稱]', '終端顯示二維碼', '手機掃碼匯入（需系統已安裝 qrencode）'],
+    ['yy port [名稱] [埠|auto]', '更改端口', '例如 yy port anytls 8443 或 yy port snell auto'],
+    ['yy passwd [名稱] [密碼|auto]', '更改密碼 / PSK', '例如 yy passwd snell auto（自動產生合規 36 位 UUID）'],
+    ['yy id [名稱] [uuid|auto]', '更改 UUID', '適用 VLESS / VMess / TUIC，例如 yy id reality auto'],
+    ['yy host [名稱] [域名]', '更改域名', '適用 *TLS / Naive / AnyTLS ACME 節點'],
+    ['yy path [名稱] [/路徑|auto]', '更改傳輸路徑', '適用 WS / H2 / HTTPUpgrade 節點'],
+    ['yy sni [名稱] [域名]', '更改 REALITY SNI', '例如 yy sni reality www.cloudflare.com'],
+    ['yy key [名稱] auto', '更換 REALITY 密鑰對', '一鍵重新產生 Private/Public Key'],
+    ['yy method [名稱] [演算法|auto]', '更改 SS 加密方式', '例如 yy method ss 2022-blake3-aes-256-gcm'],
+    ['yy user [名稱] [用戶名]', '更改用戶名', '適用 NaiveProxy 與 Socks5'],
+    ['yy web [名稱] [偽裝站]', '更改 Caddy 偽裝網站', '例如 yy web ws.example.com example.com'],
+    ['yy new [名稱] [新協議]', '直接切換節點協議', '保留埠等參數並轉換為另一種協議'],
+    ['yy del [名稱]', '刪除單個配置', '直接刪除無需二次確認，請謹慎使用，例如 yy del snell'],
+    ['yy ddel [名1] [名2]', '批量刪除多個配置', '一次移除多個設定檔並重啟核心'],
+    ['yy fix [名稱] / yy fix-all', '修復配置格式', '重新規範單個或全部配置 JSON'],
+    ['yy gen [協議] [參數...]', '預覽 JSON 不落盤', '測試用，例如 yy gen snell 19443'],
+    ['yy no-auto-tls [協議] ...', '停用自動 Caddy TLS', '自行用 Nginx/外部反代處理 TLS 時使用']
+  ];
+
+  const ARGO_ROWS = [
+    ['yy argo', '開啟 CF Argo 互動管理選單'],
+    ['yy argo quick', '一鍵開啟免域名臨時隧道（自動綁定/新建 VMess-WS，HTTP2 模式）'],
+    ['yy argo quick vless auto quic', '開啟臨時隧道，指定 VLESS-WS 後端並改用 QUIC (UDP) 傳輸'],
+    ['yy argo fixed argo.example.com <TOKEN> vmess', '一鍵開啟 CF 固定隧道（Zero Trust Tunnel）'],
+    ['yy argo info', '查看 Argo 狀態、網域與 443 TLS / 80 無 TLS 優選連結'],
+    ['yy argo proto', '一鍵切換隧道傳輸模式：HTTP2 (TCP) ⇄ QUIC (UDP)'],
+    ['yy argo status / restart / stop', '查看運行狀態、重啟或停止 Argo 服務'],
+    ['yy argo log', '查看最近 50 行 cloudflared 日誌（排錯專用）'],
+    ['yy argo update', '更新 cloudflared 內核至最新版'],
+    ['yy argo del', '關閉並移除 CF Argo 隧道設定（保留本地 sing-box 節點）']
+  ];
+
+  const AI_ROWS = [
+    ['yy ai json', '以純淨結構化 JSON 匯出所有節點、Argo 狀態與分享連結列表'],
+    ['yy ai deploy --protocols "anytls,snell,hy2" --json', '已安裝後宣告式批量追加協議並回傳 JSON'],
+    ['yy ai doctor --json', '一鍵執行 sing-box check 配置校驗、服務狀態、BBR 與核心版本體檢'],
+    ['yy ai prompt', '在終端印出可直接貼給 Claude / Antigravity / OpenClaw 的代部署提示詞'],
+    ['install.sh --non-interactive --protocols "..." --json', '安裝腳本無交互模式，支援 --argo / --bbr / --skip-dns-check / --no-default'],
+    ['WHY666_PROTOCOLS="anytls,snell" WHY666_JSON=1 ...', '環境變數單行驅動安裝，支援 WHY666_ARGO / WHY666_BBR / WHY666_DEFAULT_PROTO']
+  ];
+
+  const OPS_ROWS = [
+    ['yy status', '查看 sing-box / Caddy / CF Argo 全部服務狀態'],
+    ['yy start / stop / restart [caddy|argo]', '啟動、停止或重啟指定服務（預設為 sing-box）'],
+    ['yy update sh', '更新 why666 腳本至最新 Release（同步更新短命令）'],
+    ['yy update core [版本號]', '更新 sing-box 核心（例如 yy update core 或指定 v1.14.4）'],
+    ['yy update caddy / yy update argo', '分別更新 Caddy 或 cloudflared'],
+    ['yy bbr', '一鍵寫入 sysctl 啟用 BBR + fq 網路加速（需內核 ≥ 4.9）'],
+    ['yy dns [11|88|cf|gg|family|set|none]', '配置 sing-box 上游 DNS（例如 yy dns cf）'],
+    ['yy log [info|warn|error|none|del]', '即時查看訪問日誌、切換日誌等級或清空/停用日誌'],
+    ['yy import', '匯入既有 /etc/sing-box/conf、/etc/xray/conf 或 /etc/v2ray/conf 配置'],
+    ['yy ip / yy get-port / yy pbk / yy ss2022', '快速查公網 IP、取空閒埠、產 REALITY 金鑰對、產 SS2022 密碼'],
+    ['yy bin <原指令> / yy check ...', '直接透傳官方 sing-box 二進位指令'],
+    ['yy reinstall / yy uninstall', '重裝腳本 / 完整卸載（含 systemd/OpenRC 服務與 Argo）']
+  ];
+
+  const FAQS = [
+    {
+      q: '1. 為什麼 Snell v6 在 NekoBox / Mihomo 報 "snell v6 psk length must be between 12 and 255 bytes"？',
+      a: 'Snell v6 協議規範強制要求密碼（PSK）長度必須在 12 到 255 字節之間（例如 8 位的短密碼會被雙端拒絕）。另外部分 NekoBox (Mihomo) 魔改版匯入連結時可能漏填 PSK 或把端口重置為 443。解決方法：在 VPS 執行 <code>yy passwd snell auto</code> 換成 36 位 UUID，重新匯入第 1 條 <code>Nekobox/sing-box</code> 連結，並點節點編輯確認端口與 PSK 與伺服器一致。'
+    },
+    {
+      q: '2. 為什麼新增 native / naive (NaiveProxy) 會說一定要有域名？',
+      a: 'NaiveProxy 客戶端直接套用 Chrome 網路堆疊偽裝成正常 HTTPS 訪問，強制驗證由受信任 CA（如 Let\'s Encrypt）簽發的真實 TLS 證書，不支援跳過證書驗證（沒有 allowInsecure）。因此必須提供已將 DNS A 記錄直接指向 VPS IP（關閉 CF 小黃雲）的域名讓 ACME 自動申請證書。若沒有域名，直接改用免域名的 <code>anytls</code>、<code>reality</code>、<code>anyreality</code>、<code>hy2</code>、<code>snell</code> 或 <code>yy argo quick</code> 即可。'
+    },
+    {
+      q: '3. Hysteria2 / TUIC / Naive H3 連不上怎麼排查？',
+      a: '這三個協議使用 UDP/QUIC 傳輸。請先執行 <code>yy ai doctor</code> 確認 sing-box 正在運行且配置 valid，然後檢查 VPS 系統防火牆（ufw / firewalld / iptables）及雲服務商控制台（AWS / GCP / Oracle / 阿里雲等）安全群組是否同時放行該端口的 <strong>TCP 與 UDP</strong> 流量。'
+    },
+    {
+      q: '4. 之前安裝的是舊版（短命令 w6），如何升級成短命令 yy？',
+      a: '直接在伺服器執行 <code>why666 update sh</code> 升級到 v1.1.0 以上即可，腳本會自動建立 <code>/usr/local/bin/yy</code> 並移除舊的 <code>w6</code> 別名。'
+    },
+    {
+      q: '5. 如何同時運行多個不同協議的節點？',
+      a: '<code>why666</code> 天生就是多配置並行架構，每次執行 <code>yy add &lt;協議&gt;</code> 都會在 <code>/etc/why666/conf/</code> 新增獨立 JSON 檔，互不覆蓋。隨時用 <code>yy ls</code> 查看全部節點，或用 <code>yy ai json</code> 一次匯出所有連結。'
+    }
+  ];
+
+  // Helpers
+  const toastEl = document.getElementById('toast');
+  let toastTimer;
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
+  }
+  async function copyText(str) {
+    try {
+      await navigator.clipboard.writeText(str);
+      showToast('已複製：' + (str.length > 48 ? str.slice(0, 48) + '…' : str));
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = str;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      showToast('已複製到剪貼簿');
+    }
+  }
+  function escHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Install Tabs
+  const INSTALL_MAP = {
+    curl: {
+      note: '預設自動安裝 sing-box 最新正式版並建立一個 AnyTLS 節點（需 root 權限）',
+      cmd: `bash <(curl -fsSL ${RAW}/install.sh)`
+    },
+    wget: {
+      note: '適用於精簡版未安裝 curl 的 Linux 系統',
+      cmd: `bash <(wget -qO- ${RAW}/install.sh)`
+    },
+    update: {
+      note: '已安裝伺服器一鍵升級至最新腳本版本（自動啟用短命令 yy）',
+      cmd: 'why666 update sh'
+    }
+  };
+  document.querySelectorAll('#installTabs .tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#installTabs .tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const item = INSTALL_MAP[btn.dataset.install];
+      document.getElementById('installNote').textContent = item.note;
+      document.getElementById('installCmd').textContent = item.cmd;
+    });
+  });
+
+  // Generic copy buttons
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-copy-target]');
+    if (t) {
+      const el = document.getElementById(t.dataset.copyTarget);
+      if (el) copyText(el.textContent.trim());
+      return;
+    }
+    const direct = e.target.closest('[data-copy]');
+    if (direct) {
+      copyText(direct.dataset.copy);
+    }
+  });
+
+  // Single Command Builder
+  const sbProto = document.getElementById('sbProto');
+  const sbFields = document.getElementById('singleBuilderFields');
+  const sbOutput = document.getElementById('sbOutput');
+  const sbHint = document.getElementById('sbHint');
+
+  PROTOCOLS.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.name} (${p.aliases})`;
+    sbProto.appendChild(opt);
+  });
+
+  function renderSingleBuilderFields() {
+    const p = PROTOCOLS.find(x => x.id === sbProto.value) || PROTOCOLS[0];
+    sbFields.innerHTML = '';
+    p.fields.forEach((f, idx) => {
+      const div = document.createElement('div');
+      div.className = 'field';
+      const fid = `sbf_${idx}`;
+      if (f.type === 'select') {
+        const opts = f.options.map(([v, l]) => `<option value="${escHtml(v)}">${escHtml(l)}</option>`).join('');
+        div.innerHTML = `<label for="${fid}">${escHtml(f.label)}</label><select id="${fid}" data-idx="${idx}">${opts}</select>`;
+      } else {
+        div.innerHTML = `<label for="${fid}">${escHtml(f.label)}</label><input id="${fid}" data-idx="${idx}" type="text" placeholder="${escHtml(f.placeholder || '')}" />`;
+      }
+      sbFields.appendChild(div);
+    });
+    sbFields.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', updateSingleBuilderOutput);
+      el.addEventListener('change', updateSingleBuilderOutput);
+    });
+    sbHint.textContent = p.note;
+    updateSingleBuilderOutput();
+  }
+
+  function updateSingleBuilderOutput() {
+    const p = PROTOCOLS.find(x => x.id === sbProto.value) || PROTOCOLS[0];
+    const vals = p.fields.map((f, idx) => {
+      const el = document.getElementById(`sbf_${idx}`);
+      return el ? el.value.trim() : '';
+    });
+    // Find last non-empty or required argument index
+    let lastIdx = -1;
+    vals.forEach((v, i) => {
+      if (v || p.fields[i].required) lastIdx = i;
+    });
+    const args = [];
+    for (let i = 0; i <= lastIdx; i++) {
+      if (vals[i]) args.push(vals[i]);
+      else if (p.fields[i].required) args.push(`<${p.fields[i].key}>`);
+      else args.push('auto');
+    }
+    const baseProto = p.id;
+    sbOutput.textContent = args.length ? `yy add ${baseProto} ${args.join(' ')}` : `yy add ${baseProto}`;
+  }
+  sbProto.addEventListener('change', renderSingleBuilderFields);
+  renderSingleBuilderFields();
+
+  // Render Protocol Cards
+  const protoCardsEl = document.getElementById('protoCards');
+  let currentCat = 'all';
+  let currentQuery = '';
+
+  function renderProtocolCards() {
+    const q = currentQuery.toLowerCase();
+    const list = PROTOCOLS.filter(p => {
+      if (currentCat !== 'all' && p.cat !== currentCat) return false;
+      if (!q) return true;
+      const hay = `${p.id} ${p.name} ${p.aliases} ${p.syntax} ${p.note} ${p.examples.map(e => e.cmd + ' ' + e.desc).join(' ')}`.toLowerCase();
+      return hay.includes(q);
+    });
+    document.getElementById('protoCountText').textContent = `顯示 ${list.length} / ${PROTOCOLS.length} 組協議`;
+    if (!list.length) {
+      protoCardsEl.innerHTML = `<p style="color:var(--muted);grid-column:1/-1;">找不到符合「${escHtml(currentQuery)}」的協議，請嘗試搜尋 snell、anytls、naive、reality 或 hy2。</p>`;
+      return;
+    }
+    protoCardsEl.innerHTML = list.map(p => {
+      const badgesHtml = p.badges.map(([txt, cls]) => `<span class="pill ${cls}">${escHtml(txt)}</span>`).join('');
+      const exHtml = p.examples.map(ex => `
+        <div class="mini-cmd">
+          <div class="mini-cmd-text">
+            <span class="mini-cmd-desc"># ${escHtml(ex.desc)}</span>
+            ${escHtml(ex.cmd)}
+          </div>
+          <button class="mini-copy" type="button" data-copy="${escHtml(ex.cmd)}">複製</button>
+        </div>
+      `).join('');
+      return `
+        <article class="proto-card">
+          <div class="proto-card-top">
+            <span class="proto-name">${escHtml(p.name)}</span>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">${badgesHtml}</div>
+          </div>
+          <div class="proto-aliases">別名：${escHtml(p.aliases)}</div>
+          <div class="proto-syntax">${escHtml(p.syntax)}</div>
+          <p class="proto-note">${escHtml(p.note)}</p>
+          <div class="proto-examples">${exHtml}</div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  document.querySelectorAll('#protoFilterTabs .tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#protoFilterTabs .tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCat = btn.dataset.cat;
+      renderProtocolCards();
+    });
+  });
+
+  // Render Reference Tables
+  function renderSimpleTable(elId, rows, threeCols = false) {
+    const tbody = document.getElementById(elId);
+    const q = currentQuery.toLowerCase();
+    const filtered = rows.filter(r => !q || r.join(' ').toLowerCase().includes(q));
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="${threeCols ? 3 : 2}" style="color:var(--muted);">無符合搜尋條件的指令</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = filtered.map(r => {
+      const rawCmd = r[0].split(' / ')[0];
+      if (threeCols) {
+        return `<tr>
+          <td><div class="tbl-cmd"><code>${escHtml(r[0])}</code><button class="tbl-copy" type="button" data-copy="${escHtml(rawCmd)}">複製</button></div></td>
+          <td><strong>${escHtml(r[1])}</strong></td>
+          <td style="color:var(--muted);">${escHtml(r[2])}</td>
+        </tr>`;
+      }
+      return `<tr>
+        <td><div class="tbl-cmd"><code>${escHtml(r[0])}</code><button class="tbl-copy" type="button" data-copy="${escHtml(rawCmd)}">複製</button></div></td>
+        <td style="color:var(--muted);">${escHtml(r[1])}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Render FAQ
+  function renderFaq() {
+    const q = currentQuery.toLowerCase();
+    const filtered = FAQS.filter(f => !q || (f.q + ' ' + f.a).toLowerCase().includes(q));
+    document.getElementById('faqList').innerHTML = filtered.map(f => `
+      <div class="faq-item">
+        <h3>${escHtml(f.q)}</h3>
+        <p>${f.a}</p>
+      </div>
+    `).join('') || '<p style="color:var(--muted);">無符合搜尋條件的常見問題。</p>';
+  }
+
+  function renderAllFilterable() {
+    renderProtocolCards();
+    renderSimpleTable('manageTableBody', MANAGE_ROWS, true);
+    renderSimpleTable('argoTableBody', ARGO_ROWS, false);
+    renderSimpleTable('aiTableBody', AI_ROWS, false);
+    renderSimpleTable('opsTableBody', OPS_ROWS, false);
+    renderFaq();
+  }
+
+  // Global Search + "/" shortcut
+  const searchInput = document.getElementById('globalSearch');
+  searchInput.addEventListener('input', () => {
+    currentQuery = searchInput.value.trim();
+    renderAllFilterable();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      searchInput.focus();
+    }
+  });
+
+  // Multi-protocol Builder
+  const MULTI_PROTOS = [
+    { key: 'anytls', label: 'AnyTLS (預設)', checked: true, ph: '埠號(留空隨機)' },
+    { key: 'reality', label: 'VLESS-REALITY', checked: true, ph: '埠號(留空隨機)' },
+    { key: 'snell', label: 'Snell v6', checked: true, ph: '埠號(留空隨機)' },
+    { key: 'hy2', label: 'Hysteria2', checked: false, ph: 'UDP 埠號' },
+    { key: 'anyreality', label: 'AnyTLS-REALITY', checked: false, ph: '埠號(留空隨機)' },
+    { key: 'naive', label: 'NaiveProxy (需域名)', checked: false, ph: '域名[:埠] 如 a.com:443' },
+    { key: 'tuic', label: 'TUIC v5', checked: false, ph: 'UDP 埠號' },
+    { key: 'ss', label: 'Shadowsocks 2022', checked: false, ph: '埠號(留空隨機)' },
+    { key: 'ws', label: 'VMess-WS (Argo)', checked: false, ph: '埠號(留空隨機)' },
+    { key: 'vless-ws', label: 'VLESS-WS (Argo)', checked: false, ph: '埠號(留空隨機)' }
+  ];
+  const multiGrid = document.getElementById('multiProtoGrid');
+  multiGrid.innerHTML = MULTI_PROTOS.map(p => `
+    <div class="check-item">
+      <label><input type="checkbox" data-mp="${p.key}" ${p.checked ? 'checked' : ''} /> ${escHtml(p.label)}</label>
+      <input type="text" data-mp-arg="${p.key}" placeholder="${escHtml(p.ph)}" />
+    </div>
+  `).join('');
+
+  let multiMode = 'curl';
+  const mArgoMode = document.getElementById('mArgoMode');
+  const mArgoBackend = document.getElementById('mArgoBackend');
+  const mArgoProto = document.getElementById('mArgoProto');
+  const mArgoDomain = document.getElementById('mArgoDomain');
+  const mArgoToken = document.getElementById('mArgoToken');
+  const mBbr = document.getElementById('mBbr');
+  const mJson = document.getElementById('mJson');
+  const mSkipDns = document.getElementById('mSkipDns');
+  const multiOutput = document.getElementById('multiOutput');
+
+  function renderMultiOutput() {
+    const am = mArgoMode.value;
+    mArgoBackend.disabled = !am;
+    mArgoProto.disabled = !am;
+    mArgoDomain.disabled = am !== 'fixed';
+    mArgoToken.disabled = am !== 'fixed';
+
+    const specs = [];
+    document.querySelectorAll('[data-mp]').forEach(cb => {
+      if (!cb.checked) return;
+      const k = cb.dataset.mp;
+      const arg = (document.querySelector(`[data-mp-arg="${k}"]`).value || '').trim();
+      specs.push(arg ? `${k}:${arg}` : k);
+    });
+    const csv = specs.join(',');
+    const flags = ['--non-interactive'];
+    if (csv) flags.push(`--protocols "${csv}"`);
+    else if (!am) flags.push('--no-default');
+    if (am) {
+      flags.push(`--argo ${am}`);
+      if (mArgoBackend.value !== 'vmess') flags.push(`--argo-backend ${mArgoBackend.value}`);
+      if (mArgoProto.value !== 'http2') flags.push(`--argo-proto ${mArgoProto.value}`);
+      if (am === 'fixed') {
+        flags.push(`--argo-domain "${mArgoDomain.value.trim() || 'argo.example.com'}"`);
+        flags.push(`--argo-token "${mArgoToken.value.trim() || 'YOUR_CF_TUNNEL_TOKEN'}"`);
+      }
+    }
+    if (mBbr.checked) flags.push('--bbr');
+    if (mSkipDns.checked) flags.push('--skip-dns-check');
+    if (mJson.checked) flags.push('--json');
+
+    const curlBase = `bash <(curl -fsSL ${RAW}/install.sh)`;
+    const wgetBase = `bash <(wget -qO- ${RAW}/install.sh)`;
+
+    if (multiMode === 'curl') {
+      multiOutput.textContent = `${curlBase} \\\n  ${flags.join(' ')}`;
+    } else if (multiMode === 'wget') {
+      multiOutput.textContent = `${wgetBase} \\\n  ${flags.join(' ')}`;
+    } else if (multiMode === 'env') {
+      const envs = ['WHY666_NON_INTERACTIVE=1'];
+      if (csv) envs.push(`WHY666_PROTOCOLS="${csv}"`);
+      if (am) {
+        envs.push(`WHY666_ARGO="${am}"`);
+        if (mArgoBackend.value !== 'vmess') envs.push(`WHY666_ARGO_BACKEND="${mArgoBackend.value}"`);
+        if (mArgoProto.value !== 'http2') envs.push(`WHY666_ARGO_PROTO="${mArgoProto.value}"`);
+        if (am === 'fixed') {
+          envs.push(`WHY666_ARGO_DOMAIN="${mArgoDomain.value.trim() || 'argo.example.com'}"`);
+          envs.push(`WHY666_ARGO_TOKEN="${mArgoToken.value.trim() || 'YOUR_CF_TUNNEL_TOKEN'}"`);
+        }
+      }
+      if (mBbr.checked) envs.push('WHY666_BBR=1');
+      if (mSkipDns.checked) envs.push('WHY666_SKIP_DNS_CHECK=1');
+      if (mJson.checked) envs.push('WHY666_JSON=1');
+      multiOutput.textContent = `${envs.join(' ')} ${curlBase}`;
+    } else {
+      multiOutput.textContent = [
+        `請先閱讀 ${RAW}/SKILL.md，然後透過 SSH 登入我的 Linux VPS 並執行以下無交互部署：`,
+        '',
+        `${curlBase} ${flags.join(' ')}`,
+        '',
+        '部署完成後請執行 `yy ai doctor --json` 確認設定校驗與服務運行正常，最後把節點參數與可直接匯入客戶端的分享連結整理給我。'
+      ].join('\n');
+    }
+  }
+
+  document.querySelectorAll('#builder-multi input, #builder-multi select').forEach(el => {
+    el.addEventListener('input', renderMultiOutput);
+    el.addEventListener('change', renderMultiOutput);
+  });
+  document.querySelectorAll('#multiOutTabs .tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#multiOutTabs .tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      multiMode = btn.dataset.mode;
+      renderMultiOutput();
+    });
+  });
+
+  // Theme Toggle
+  const themeBtn = document.getElementById('themeBtn');
+  if (localStorage.getItem('why666_theme') === 'dark') {
+    document.body.classList.add('dark');
+  }
+  themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('why666_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  });
+
+  // Mobile search toggle, drawer & back-to-top
+  const topbar = document.getElementById('topbar');
+  const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+  if (mobileSearchBtn) {
+    mobileSearchBtn.addEventListener('click', () => {
+      const open = topbar.classList.toggle('search-open');
+      mobileSearchBtn.textContent = open ? '收起' : '搜尋';
+      if (open) searchInput.focus();
+    });
+  }
+
+  const drawer = document.getElementById('mobileDrawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  function setDrawer(open) {
+    drawer.classList.toggle('open', open);
+    backdrop.classList.toggle('open', open);
+  }
+  document.getElementById('drawerOpenBtn').addEventListener('click', () => setDrawer(true));
+  document.getElementById('drawerCloseBtn').addEventListener('click', () => setDrawer(false));
+  backdrop.addEventListener('click', () => setDrawer(false));
+  document.querySelectorAll('#drawerLinks a').forEach(a => {
+    a.addEventListener('click', () => setDrawer(false));
+  });
+
+  const backTopBtn = document.getElementById('backTopBtn');
+  window.addEventListener('scroll', () => {
+    backTopBtn.classList.toggle('show', window.scrollY > 380);
+  }, { passive: true });
+  backTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Active nav highlighting on scroll (desktop sidebar + mobile quick bar + drawer)
+  const navLinks = Array.from(document.querySelectorAll('#navList a, #mobileQuickNav a, #drawerLinks a'));
+  const sectionIds = ['#quickstart', '#builder-single', '#protocols', '#manage', '#argo', '#ai', '#builder-multi', '#ops', '#faq'];
+  const sections = sectionIds.map(id => document.querySelector(id)).filter(Boolean);
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const href = '#' + entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === href));
+        const activeQuick = document.querySelector(`#mobileQuickNav a[href="${href}"]`);
+        if (activeQuick && window.innerWidth <= 960) {
+          activeQuick.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }
+    });
+  }, { rootMargin: '-18% 0px -70% 0px' });
+  sections.forEach(s => io.observe(s));
+
+  renderAllFilterable();
+  renderMultiOutput();
+})();
+</script>
+</body>
+</html>

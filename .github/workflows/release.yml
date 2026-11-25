@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract and verify version
+        run: |
+          VER=$(grep -m1 '^is_sh_ver=' why666.sh | cut -d= -f2 | tr -d '[:space:]')
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" != "${VER}" ]]; then
+            echo "ERROR: Git tag (${GITHUB_REF_NAME}) does not match why666.sh is_sh_ver (${VER})"
+            exit 1
+          fi
+          echo "RELEASE_TAG=${VER}" >> "$GITHUB_ENV"
+
+      - name: Package code.tar.gz
+        run: |
+          tar --exclude='.git' --exclude='.github' --exclude='code.tar.gz' -zcf code.tar.gz install.sh why666.sh src README.md SKILL.md llms.txt LICENSE
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: why666 ${{ env.RELEASE_TAG }}
+          files: code.tar.gz
+          generate_release_notes: true

@@ -1,0 +1,56 @@
+name: CI Validation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Bash syntax check
+        run: |
+          for f in *.sh src/*.sh; do
+            bash -n "$f"
+          done
+
+      - name: End-to-end install & protocol validation on Linux
+        timeout-minutes: 3
+        run: |
+          echo "=== Running install.sh ==="
+          sudo timeout 90 bash install.sh --local-install --non-interactive --skip-dns-check \
+            --protocols "reality,hy2,tuic,snell,snell5,anytls,anyreality,ss,trojan,ws,vless-ws,socks,naive:naive.example.com:14443:demo:demopass123456" \
+            --json > /tmp/deploy.json
+          cat /tmp/deploy.json
+
+          echo "=== Validate JSON output ==="
+          jq -e '.ok == true and (.nodes | length) == 13 and (.share_links | length) >= 13' /tmp/deploy.json
+
+          echo "=== Verify native alias & yy short command ==="
+          sudo timeout 30 yy no-auto-tls native native2.example.com 14444 demo2 demopass123456
+          sudo yy ls
+
+          echo "=== Verify Snell v6 short PSK rejection ==="
+          if sudo yy add snell 14445 shortpsk 6; then
+            echo "ERROR: short PSK should have been rejected"
+            exit 1
+          fi
+
+          echo "=== Verify sing-box config check ==="
+          sudo /etc/why666/bin/sing-box check -c /etc/why666/config.json -C /etc/why666/conf
+
+          echo "=== Verify ai doctor & ai json ==="
+          sudo why666 ai doctor --json > /tmp/doctor.json
+          cat /tmp/doctor.json
+          jq -e '.config_valid == true and .config_count == 14' /tmp/doctor.json
+          sudo why666 ai json | jq -e '.ok == true and (.nodes | length) == 14'
+
+          echo "=== Verify CF Argo quick tunnel ==="
+          sudo timeout 45 why666 argo quick vmess auto http2 || true
+          sudo why666 argo status
+          sudo why666 ai json | jq '.argo'
