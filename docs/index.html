@@ -7,47 +7,47 @@
   <meta name="description" content="why666 官方使用說明書：完整收錄所有 sing-box 協議新增指令（AnyTLS、Snell v6、NaiveProxy、VLESS-REALITY、Hysteria2 等）、單條指令拼裝器、CF Argo 隧道、AI 無交互部署與排錯指南。" />
   <style>
     :root {
-      --bg: #f6f3ec;
-      --bg-dot: rgba(23, 22, 20, 0.06);
-      --surface: #fffdf8;
-      --surface-2: #efeae0;
-      --ink: #171614;
-      --muted: #5c574e;
-      --border: #d9d2c5;
-      --accent: #c84b1a;
-      --accent-soft: rgba(200, 75, 26, 0.11);
+      --bg: #f0f7ff;
+      --bg-dot: rgba(2, 132, 199, 0.08);
+      --surface: #ffffff;
+      --surface-2: #e6f2ff;
+      --ink: #0f2942;
+      --muted: #4b6584;
+      --border: #cfe2f5;
+      --accent: #0284c7;
+      --accent-soft: rgba(2, 132, 199, 0.12);
       --accent-ink: #ffffff;
-      --ok: #1b7a4c;
-      --ok-soft: rgba(27, 122, 76, 0.12);
-      --warn: #a15c07;
-      --warn-soft: rgba(161, 92, 7, 0.12);
-      --code-bg: #151614;
-      --code-ink: #f1ece1;
-      --code-muted: #938e84;
-      --shadow: 0 2px 10px rgba(23, 22, 20, 0.05);
+      --ok: #0d9488;
+      --ok-soft: rgba(13, 148, 136, 0.12);
+      --warn: #d97706;
+      --warn-soft: rgba(217, 119, 6, 0.12);
+      --code-bg: #0f2136;
+      --code-ink: #e8f3ff;
+      --code-muted: #7da0c4;
+      --shadow: 0 4px 16px rgba(14, 116, 194, 0.07);
       --radius: 12px;
       --mono: "JetBrains Mono", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
       --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .dark {
-      --bg: #111210;
-      --bg-dot: rgba(255, 255, 255, 0.045);
-      --surface: #191b18;
-      --surface-2: #232621;
-      --ink: #ece8df;
-      --muted: #9f9a8f;
-      --border: #2e322b;
-      --accent: #ef6d3b;
-      --accent-soft: rgba(239, 109, 59, 0.16);
-      --accent-ink: #111210;
-      --ok: #38c17c;
-      --ok-soft: rgba(56, 193, 124, 0.16);
-      --warn: #f0b44c;
-      --warn-soft: rgba(240, 180, 76, 0.16);
-      --code-bg: #0b0c0a;
-      --code-ink: #e8e2d5;
-      --code-muted: #7c776e;
-      --shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+      --bg: #0b1422;
+      --bg-dot: rgba(147, 197, 253, 0.06);
+      --surface: #111f33;
+      --surface-2: #182b45;
+      --ink: #eaf3ff;
+      --muted: #8ea9c9;
+      --border: #233b5c;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --accent-ink: #082032;
+      --ok: #2dd4bf;
+      --ok-soft: rgba(45, 212, 191, 0.16);
+      --warn: #fbbf24;
+      --warn-soft: rgba(251, 191, 36, 0.16);
+      --code-bg: #070e18;
+      --code-ink: #e2efff;
+      --code-muted: #6c8bb0;
+      --shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; overflow-x: clip; }
@@ -219,8 +219,8 @@
     /* Main Content */
     .main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
     .hero {
-      background: var(--surface);
-      border: 2px solid var(--ink);
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+      border: 2px solid var(--accent);
       border-radius: 16px;
       padding: 26px 26px 22px;
       box-shadow: var(--shadow);
@@ -312,7 +312,7 @@
       right: 9px;
       top: 9px;
       background: rgba(255, 255, 255, 0.11);
-      color: #f3ede2;
+      color: #e8f3ff;
       border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 6px;
       padding: 4px 10px;
@@ -425,7 +425,7 @@
     .mini-copy {
       flex-shrink: 0;
       background: rgba(255,255,255,0.12);
-      color: #f3ede2;
+      color: #e8f3ff;
       border: none;
       border-radius: 5px;
       padding: 4px 8px;
