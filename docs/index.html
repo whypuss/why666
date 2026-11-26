@@ -226,11 +226,67 @@
       box-shadow: var(--shadow);
       scroll-margin-top: 102px;
     }
+    .hero-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
     .hero h1 {
-      margin: 0 0 8px;
+      margin: 0;
       font-size: clamp(24px, 3.2vw, 34px);
       line-height: 1.2;
       letter-spacing: -0.02em;
+    }
+    .gh-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 13px;
+      border-radius: 9px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .gh-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .gh-link svg, .btn svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+    .hero-tip-box {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+    }
+    .hero-tip-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .hero-tip-head span {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--muted);
     }
     .hero p {
       margin: 0 0 18px;
@@ -718,8 +774,9 @@
       .topbar.search-open .topbar-inner { flex-wrap: wrap; }
       .topbar.search-open .search-wrap { display: block; }
       .search-kbd { display: none; }
-      .top-actions { gap: 6px; flex-shrink: 0; }
-      .top-actions .btn { padding: 6px 10px; font-size: 12.5px; min-height: 36px; }
+      .top-actions { gap: 5px; flex-shrink: 0; }
+      .top-actions .btn { padding: 6px 9px; font-size: 12px; min-height: 36px; }
+      .gh-label-short { display: inline; }
 
       .shell {
         grid-template-columns: 1fr;
@@ -858,8 +915,11 @@
     </div>
     <div class="top-actions">
       <button class="btn mobile-only" id="mobileSearchBtn" type="button">搜尋</button>
-      <a class="btn desktop-only" href="https://github.com/whypuss/why666" target="_blank">GitHub</a>
-      <a class="btn desktop-only" href="https://raw.githubusercontent.com/whypuss/why666/main/SKILL.md" target="_blank">AI SKILL</a>
+      <a class="btn" href="https://github.com/whypuss/why666" target="_blank" rel="noopener noreferrer" aria-label="GitHub 倉庫">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <a class="btn desktop-only" href="https://raw.githubusercontent.com/whypuss/why666/main/SKILL.md" target="_blank" rel="noopener noreferrer">AI SKILL</a>
       <button class="btn" id="themeBtn" type="button">明暗</button>
       <button class="btn primary mobile-only" id="drawerOpenBtn" type="button">目錄</button>
     </div>
@@ -921,10 +981,17 @@
   <main class="main">
     <!-- Hero / Quickstart -->
     <section class="hero" id="quickstart">
-      <h1>why666 完整使用說明書</h1>
+      <div class="hero-head">
+        <h1>why666 完整使用說明書</h1>
+        <a class="gh-link" href="https://github.com/whypuss/why666" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          <span>GitHub · whypuss/why666</span>
+        </a>
+      </div>
       <p>自研 <code>sing-box</code> 多協議一鍵安裝與管理腳本。安裝後直接使用短命令 <code>yy</code>（等同 <code>why666</code>），支援多配置同時運行、一秒增刪改查、Cloudflare Argo 隧道與 AI 自動化部署。</p>
       <div class="hero-stats">
         <span class="pill accent">短命令: yy</span>
+        <span class="pill accent">查看全部節點: yy ai json</span>
         <span class="pill ok">預設協議: AnyTLS</span>
         <span class="pill">核心: sing-box ≥ 1.14</span>
         <span class="pill">支援 Ubuntu / Debian / CentOS / Rocky / SUSE / Alpine</span>
@@ -942,8 +1009,20 @@
         <button class="copy-btn" data-copy-target="installCmd" type="button">複製</button>
       </div>
 
+      <div class="hero-tip-box">
+        <div class="hero-tip-head">
+          <div>查看全部節點（最推薦）</div>
+          <span>一次列出所有已建節點參數、CF Argo 隧道狀態與全部客戶端分享連結（純淨 JSON）</span>
+        </div>
+        <div class="cmd-box" style="margin:0;">
+          <span class="cmd-note">部署完或隨時想看全部節點與分享連結，直接執行此指令即可（等同 why666 ai json）</span>
+          <pre id="quickNodesCmd">yy ai json</pre>
+          <button class="copy-btn" data-copy-target="quickNodesCmd" type="button">複製</button>
+        </div>
+      </div>
+
       <div class="callout">
-        <strong>快速規則：</strong>所有參數都支援填入 <code>auto</code> 代表隨機產生。只想開互動選單直接輸入 <code>yy</code>；想快速一鍵建節點就用 <code>yy add &lt;協議&gt; [參數...]</code>，例如 <code>yy add anytls 443</code>、<code>yy add snell</code>、<code>yy add reality</code>。
+        <strong>快速規則：</strong>所有參數都支援填入 <code>auto</code> 代表隨機產生。只想開互動選單直接輸入 <code>yy</code>；想一次查看全部節點與連結直接執行 <code>yy ai json</code>（或用 <code>yy ls</code> 看簡潔列表）；想快速一鍵建節點就用 <code>yy add &lt;協議&gt; [參數...]</code>，例如 <code>yy add anytls 443</code>、<code>yy add snell</code>、<code>yy add reality</code>。
       </div>
     </section>
 
@@ -1524,8 +1603,9 @@
   ];
 
   const MANAGE_ROWS = [
+    ['yy ai json', '查看全部節點與連結（推薦）', '一次以結構化 JSON 列出所有已建節點參數、Argo 狀態與全部客戶端分享連結'],
     ['yy', '開啟互動主選單', '無參數執行進入數字選單，適合新手操作'],
-    ['yy ls', '列出所有節點', '顯示 /etc/why666/conf/ 下所有配置檔名與 CF Argo 狀態'],
+    ['yy ls', '列出所有節點名稱', '顯示 /etc/why666/conf/ 下所有配置檔名與 CF Argo 狀態'],
     ['yy info [名稱]', '查看節點詳細資訊', '顯示協議參數、連結、Surge 行等；例如 yy info snell 或 yy info 443'],
     ['yy url [名稱]', '僅輸出分享連結', '方便純文字複製導入客戶端'],
     ['yy qr [名稱]', '終端顯示二維碼', '手機掃碼匯入（需系統已安裝 qrencode）'],
