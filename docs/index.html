@@ -249,9 +249,12 @@
       background: var(--surface);
       border: 1.5px solid var(--border);
       color: var(--ink);
-      font-size: 13px;
+      font-family: var(--mono);
+      font-size: 12.5px;
       font-weight: 700;
       text-decoration: none;
+      word-break: break-all;
+      max-width: 100%;
       transition: border-color 0.15s, color 0.15s, background 0.15s;
     }
     .gh-link:hover {
@@ -917,7 +920,8 @@
       <button class="btn mobile-only" id="mobileSearchBtn" type="button">搜尋</button>
       <a class="btn" href="https://github.com/whypuss/why666" target="_blank" rel="noopener noreferrer" aria-label="GitHub 倉庫">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-        <span>GitHub</span>
+        <span class="desktop-only">https://github.com/whypuss/why666</span>
+        <span class="mobile-only">GitHub</span>
       </a>
       <a class="btn desktop-only" href="https://raw.githubusercontent.com/whypuss/why666/main/SKILL.md" target="_blank" rel="noopener noreferrer">AI SKILL</a>
       <button class="btn" id="themeBtn" type="button">明暗</button>
@@ -985,7 +989,7 @@
         <h1>why666 完整使用說明書</h1>
         <a class="gh-link" href="https://github.com/whypuss/why666" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-          <span>GitHub · whypuss/why666</span>
+          <span>https://github.com/whypuss/why666</span>
         </a>
       </div>
       <p>自研 <code>sing-box</code> 多協議一鍵安裝與管理腳本。安裝後直接使用短命令 <code>yy</code>（等同 <code>why666</code>），支援多配置同時運行、一秒增刪改查、Cloudflare Argo 隧道與 AI 自動化部署。</p>
@@ -1214,7 +1218,7 @@
     </section>
 
     <footer>
-      why666 v1.1.1 · <a href="https://github.com/whypuss/why666" target="_blank">github.com/whypuss/why666</a> · Deployed on Cloudflare Pages
+      why666 v1.1.1 · <a href="https://github.com/whypuss/why666" target="_blank" rel="noopener noreferrer">https://github.com/whypuss/why666</a> · Deployed on Cloudflare Pages
     </footer>
   </main>
 </div>
