@@ -32,10 +32,8 @@ pass "No conflict markers or CRLF issues in shell scripts"
 
 echo "=== 3. ShellCheck static analysis (error-level blocking) ==="
 if command -v shellcheck >/dev/null 2>&1; then
-  # Block on syntax/semantic errors; print warnings as advisory without hiding real errors.
-  shellcheck --shell=bash --severity=error "${sh_files[@]}" || fail "shellcheck found error-level issues"
-  warn_count=$(shellcheck --shell=bash --severity=warning --format=gcc "${sh_files[@]}" 2>/dev/null | wc -l | tr -d ' ')
-  pass "shellcheck --severity=error passed (advisory warnings: ${warn_count})"
+  shellcheck --shell=bash --severity=error --format=gcc "${sh_files[@]}" || fail "shellcheck found error-level issues"
+  pass "shellcheck --severity=error passed across ${#sh_files[@]} scripts"
 else
   warn "shellcheck not installed locally; CI will enforce shellcheck"
 fi
