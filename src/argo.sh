@@ -228,7 +228,10 @@ argo_setup_quick() {
     fi
 
     argo_save_conf
-    [[ ! $is_quiet ]] && argo_info
+    if [[ ! $is_quiet ]]; then
+        argo_info
+    fi
+    return 0
 }
 
 argo_setup_fixed() {
@@ -264,7 +267,10 @@ argo_setup_fixed() {
 
     argo_save_conf
     msg "$(_green "CF Argo 固定隧道已配置完成! 请确认在 Cloudflare Zero Trust 后台将 Public Hostname (${argo_domain}) 指向: http://127.0.0.1:${argo_backend_port}")"
-    [[ ! $is_quiet ]] && argo_info
+    if [[ ! $is_quiet ]]; then
+        argo_info
+    fi
+    return 0
 }
 
 argo_info() {

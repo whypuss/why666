@@ -207,7 +207,10 @@ get_ip() {
     [[ ! $_ip ]] && _ip=$(_fetch "https://api64.ipify.org")
     [[ ! $_ip ]] && _ip=$(_fetch "https://icanhazip.com")
     ip=$(echo "$_ip" | tr -d '[:space:]')
-    [[ ! $ip ]] && err "获取服务器 IP 失败.."
+    if [[ ! $ip ]]; then
+        err "获取服务器 IP 失败.."
+    fi
+    return 0
 }
 
 get_port() {
@@ -812,7 +815,10 @@ del() {
         is_conf_dir_empty=1
     fi
     unset is_dont_get_ip
-    [[ $is_dont_auto_exit ]] && unset is_config_file
+    if [[ $is_dont_auto_exit ]]; then
+        unset is_config_file
+    fi
+    return 0
 }
 
 uninstall() {
@@ -2166,7 +2172,10 @@ update() {
     download "$is_update_name" "$is_new_ver"
     msg "更新成功, 当前 $is_show_name 版本: $(_green "$is_new_ver")\n"
     msg "$(_green "更新说明: https://github.com/$is_update_repo/releases/tag/$is_new_ver")\n"
-    [[ $is_update_name != 'sh' ]] && manage restart "$is_update_name" &
+    if [[ $is_update_name != 'sh' ]]; then
+        manage restart "$is_update_name" &
+    fi
+    return 0
 }
 
 is_main_menu() {
@@ -2306,7 +2315,9 @@ main() {
         esac
         is_dont_auto_exit=
         manage restart &
-        [[ $is_del_host ]] && manage restart caddy &
+        if [[ $is_del_host ]]; then
+            manage restart caddy &
+        fi
         ;;
     dns)
         load dns.sh
