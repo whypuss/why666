@@ -1,4 +1,4 @@
-name: Release
+name: Release CD
 
 on:
   push:
@@ -9,32 +9,90 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  build:
+  gate-static:
+    name: Release Gate — Static & Version Check
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      release_tag: ${{ steps.ver.outputs.release_tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Extract and verify version
+      - name: Install lint tools
         run: |
-          VER=$(grep -m1 '^is_sh_ver=' why666.sh | cut -d= -f2 | tr -d '[:space:]')
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck jq >/dev/null
+
+      - name: Run static quality gate
+        run: bash tests/static_check.sh
+
+      - name: Verify tag matches why666.sh version
+        id: ver
+        run: |
+          VER="$(grep -m1 '^is_sh_ver=' why666.sh | cut -d= -f2 | tr -d '[:space:]')"
           if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" != "${VER}" ]]; then
-            echo "ERROR: Git tag (${GITHUB_REF_NAME}) does not match why666.sh is_sh_ver (${VER})"
+            echo "ERROR: Git tag (${GITHUB_REF_NAME}) != why666.sh is_sh_ver (${VER})" >&2
             exit 1
           fi
-          echo "RELEASE_TAG=${VER}" >> "$GITHUB_ENV"
+          echo "release_tag=${VER}" >> "$GITHUB_OUTPUT"
 
-      - name: Package code.tar.gz
-        run: |
-          tar --exclude='.git' --exclude='.github' --exclude='code.tar.gz' -zcf code.tar.gz install.sh why666.sh src README.md SKILL.md llms.txt LICENSE
+  gate-e2e-ubuntu:
+    name: Release Gate — Ubuntu E2E
+    needs: gate-static
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run full Linux E2E regression suite
+        run: sudo bash tests/e2e_linux.sh
+
+  gate-e2e-alpine:
+    name: Release Gate — Alpine E2E
+    needs: gate-static
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: alpine:3.20
+    steps:
+      - name: Install Alpine runtime dependencies
+        run: apk add --no-cache bash openrc curl jq ca-certificates git tar openssl >/dev/null
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Alpine compatibility suite
+        run: bash tests/e2e_alpine.sh
+
+  publish:
+    name: Package & Publish GitHub Release
+    needs: [gate-static, gate-e2e-ubuntu, gate-e2e-alpine]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build and verify code.tar.gz + SHA256SUMS.txt
+        run: bash tests/release_verify.sh --tag "${{ needs.gate-static.outputs.release_tag }}" --out dist
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: why666 ${{ env.RELEASE_TAG }}
-          files: code.tar.gz
+          tag_name: ${{ needs.gate-static.outputs.release_tag }}
+          name: why666 ${{ needs.gate-static.outputs.release_tag }}
+          files: |
+            dist/code.tar.gz
+            dist/SHA256SUMS.txt
           generate_release_notes: true

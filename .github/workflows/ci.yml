@@ -5,52 +5,92 @@ on:
     branches:
       - main
   pull_request:
+    branches:
+      - main
+  schedule:
+    # Weekly upstream sing-box compatibility check (Mondays 03:00 UTC)
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  validate:
+  static-and-lint:
+    name: Static Check & ShellCheck
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Bash syntax check
+      - name: Install lint tools
         run: |
-          for f in *.sh src/*.sh; do
-            bash -n "$f"
-          done
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck jq >/dev/null
 
-      - name: End-to-end install & protocol validation on Linux
-        timeout-minutes: 3
+      - name: Run static quality & contract gate
+        run: bash tests/static_check.sh
+
+  e2e-ubuntu-systemd:
+    name: E2E Regression (Ubuntu systemd)
+    needs: static-and-lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run full Linux E2E regression suite
+        run: sudo bash tests/e2e_linux.sh
+
+  e2e-alpine-openrc:
+    name: E2E Compatibility (Alpine OpenRC)
+    needs: static-and-lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: alpine:3.20
+    steps:
+      - name: Install Alpine runtime dependencies
+        run: apk add --no-cache bash openrc curl jq ca-certificates git tar openssl >/dev/null
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Alpine BusyBox & OpenRC compatibility suite
+        run: bash tests/e2e_alpine.sh
+
+  release-dry-run:
+    name: Release Tarball Dry-Run
+    needs: static-and-lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify release package integrity
+        run: bash tests/release_verify.sh --dry-run
+
+  ci-gate:
+    name: CI Gate
+    needs: [static-and-lint, e2e-ubuntu-systemd, e2e-alpine-openrc, release-dry-run]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce all required CI jobs passed
         run: |
-          echo "=== Running install.sh ==="
-          sudo timeout 90 bash install.sh --local-install --non-interactive --skip-dns-check \
-            --protocols "reality,hy2,tuic,snell,snell5,anytls,anyreality,ss,trojan,ws,vless-ws,socks,naive:naive.example.com:14443:demo:demopass123456" \
-            --json > /tmp/deploy.json
-          cat /tmp/deploy.json
-
-          echo "=== Validate JSON output ==="
-          jq -e '.ok == true and (.nodes | length) == 13 and (.share_links | length) >= 13' /tmp/deploy.json
-
-          echo "=== Verify native alias & yy short command ==="
-          sudo timeout 30 yy no-auto-tls native native2.example.com 14444 demo2 demopass123456
-          sudo yy ls
-
-          echo "=== Verify Snell v6 short PSK rejection ==="
-          if sudo yy add snell 14445 shortpsk 6; then
-            echo "ERROR: short PSK should have been rejected"
+          echo "static-and-lint:    ${{ needs.static-and-lint.result }}"
+          echo "e2e-ubuntu-systemd: ${{ needs.e2e-ubuntu-systemd.result }}"
+          echo "e2e-alpine-openrc:  ${{ needs.e2e-alpine-openrc.result }}"
+          echo "release-dry-run:    ${{ needs.release-dry-run.result }}"
+          if [[ "${{ needs.static-and-lint.result }}" != "success" \
+             || "${{ needs.e2e-ubuntu-systemd.result }}" != "success" \
+             || "${{ needs.e2e-alpine-openrc.result }}" != "success" \
+             || "${{ needs.release-dry-run.result }}" != "success" ]]; then
+            echo "CI Gate blocked: one or more verification jobs failed." >&2
             exit 1
           fi
-
-          echo "=== Verify sing-box config check ==="
-          sudo /etc/why666/bin/sing-box check -c /etc/why666/config.json -C /etc/why666/conf
-
-          echo "=== Verify ai doctor & ai json ==="
-          sudo why666 ai doctor --json > /tmp/doctor.json
-          cat /tmp/doctor.json
-          jq -e '.config_valid == true and .config_count == 14' /tmp/doctor.json
-          sudo why666 ai json | jq -e '.ok == true and (.nodes | length) == 14'
-
-          echo "=== Verify CF Argo quick tunnel ==="
-          sudo timeout 45 why666 argo quick vmess auto http2 || true
-          sudo why666 argo status
-          sudo why666 ai json | jq '.argo'
+          echo "CI Gate passed: all regression checks green."

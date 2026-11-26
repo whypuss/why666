@@ -2,6 +2,9 @@
 
 新一代自研 `sing-box` 多协议一键安装与管理脚本，主打极速多配置并行、现代代理协议全覆盖、Cloudflare Argo 一键隧道与 AI Agent 无交互部署。
 
+- **GitHub 仓库**：https://github.com/whypuss/why666
+- **在线完整使用说明书与指令生成器**：https://whycat666.pages.dev/
+
 **核心特性：**
 - **极速多配置并行架构**：基于 `/etc/why666/conf/*.json` 独立多配置管理，秒级增删改查、Caddy 自动 TLS、完整兼容 `systemd` 与 `OpenRC`（Ubuntu / Debian / CentOS / Rocky / SUSE / Alpine，`amd64` / `arm64`），提供主命令 `why666` 与短命令 `yy`。
 - **现代代理协议全栈原生支持**（由官方 `sing-box >= 1.14` 单核心驱动）：
@@ -152,6 +155,18 @@ why666 uninstall                 # 完整卸载
 - [SagerNet/sing-box](https://github.com/SagerNet/sing-box) — 通用代理核心
 - [cloudflare/cloudflared](https://github.com/cloudflare/cloudflared) — Cloudflare Tunnel 客户端
 - [caddyserver/caddy](https://github.com/caddyserver/caddy) — 自动化 HTTPS 反向代理
+
+## CI/CD 质量门禁与本地验证
+
+项目内置多级自动化测试与发布门禁，避免新增协议或功能时破坏既有逻辑：
+
+- **本地提交前秒级预检**：`make check`（检查全部脚本 `bash -n`、`shellcheck`、`load` 依赖完整性、版本与文档同步、`docs/index.html` 内嵌 JS 语法）
+- **本地打包自检**：`make release-check`（模拟生成 `code.tar.gz` 并解包验证完整性）
+- **文檔站点发布**：`make deploy-docs`（校验通过后部署至 Cloudflare Pages 并直连线上验收）
+- **GitHub Actions 流水线**：
+  - `CI Validation`（`ci.yml`）：`Static Check & ShellCheck` → 并行执行 `E2E Regression (Ubuntu systemd)`（28 协议配置、CRUD 增删改查、AI JSON/Deploy/Doctor 契约、真实 SOCKS5 流量转发、CF Argo）+ `E2E Compatibility (Alpine OpenRC)` + `Release Tarball Dry-Run` → 统一 `CI Gate` 门禁，并每周定时巡检上游 `sing-box` 兼容性。
+  - `Release CD`（`release.yml`）：推送 `v*` 标签后强制先过静态与双系统 E2E 门禁，确认版本号匹配后再打包发布 `code.tar.gz` 与 `SHA256SUMS.txt`。
+  - `Docs Validation & Pages CD`（`docs-pages.yml`）：校验文档并在配置 `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` Secrets 后自动发布至 Cloudflare Pages。
 
 ## License
 

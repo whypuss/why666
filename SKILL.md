@@ -5,6 +5,9 @@ description: Use this skill to automatically install, configure, diagnose, and m
 
 # why666 AI Agent Deployment Skill
 
+- Repository: https://github.com/whypuss/why666
+- Interactive Docs: https://whycat666.pages.dev/
+
 `why666` is a high-efficiency multi-config `sing-box` (>= 1.14) management script built with first-class non-interactive CLI flags, Cloudflare Argo tunnel automation, and structured JSON output for AI Agents.
 
 ## Core Rules for AI Agents

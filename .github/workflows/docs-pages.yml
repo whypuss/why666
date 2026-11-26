@@ -1,0 +1,72 @@
+name: Docs Validation & Pages CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'why666.sh'
+      - '.github/workflows/docs-pages.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'why666.sh'
+  workflow_dispatch:
+
+concurrency:
+  group: docs-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-docs:
+    name: Validate Docs HTML & Inline JS
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run static docs & contract checks
+        run: bash tests/static_check.sh
+
+  deploy-pages:
+    name: Deploy to Cloudflare Pages
+    needs: validate-docs
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Cloudflare Pages secrets
+        id: cf_check
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [[ -n "$CF_TOKEN" && -n "$CF_ACCOUNT" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Cloudflare Pages secrets (CLOUDFLARE_API_TOKEN & CLOUDFLARE_ACCOUNT_ID) not set yet; skipped auto-deploy. Use 'make deploy-docs' locally or add secrets in repo settings."
+          fi
+
+      - name: Deploy docs/ to Cloudflare Pages (whycat666)
+        if: steps.cf_check.outputs.configured == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy docs --project-name=whycat666 --branch=main
+
+      - name: Smoke-check live site
+        if: steps.cf_check.outputs.configured == 'true'
+        run: |
+          sleep 4
+          curl -fsSL "https://whycat666.pages.dev/?_v=$(date +%s)" | grep -q 'https://github.com/whypuss/why666'
+          curl -fsSL "https://whycat666.pages.dev/?_v=$(date +%s)" | grep -q 'yy ai json'
+          echo "Cloudflare Pages live verification passed."
